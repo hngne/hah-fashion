@@ -1,0 +1,6 @@
+@QA_TMDT_HostAddress = http://localhost:5285
+
+GET {{QA_TMDT_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

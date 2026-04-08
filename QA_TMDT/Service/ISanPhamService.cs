@@ -1,0 +1,23 @@
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using QA_TMDT.Dtos.Request;
+using QA_TMDT.Dtos.Response;
+using QA_TMDT.Model;
+using QA_TMDT.Helper;
+
+namespace QA_TMDT.Service
+{
+    public interface ISanPhamService
+    {
+        Task<PageResult<SanPhamResponse>> GetAllSP(int page, int pageSize);
+        Task<(bool success, string message, SanPhamResponse? response)> CreateSP(SanPhamRequest request);
+        Task<(bool success, string message, ChiTietSanPhamResponse? response)> CreateVariant(AddBienTheRequest request);
+        Task<SanPhamResponse?> GetFullInFoByMaSP(string masp);
+        Task<PageResult<SanPhamResponse>> GetByMaDM(int maDM, int page, int pageSize);
+        Task<PageResult<SanPhamResponse>> GetByTenSP(string tenSP, int page, int pageSize);
+        Task<ChiTietSanPhamResponse?> GetChiTietSPByMaCTSP(string maCTSP);
+        Task<(bool success, string message, ChiTietSanPhamResponse? response)> UpdateStockCTSP(string maCTSP, int soluongthaydoi);
+        Task<(bool success, string message, ChiTietSanPhamResponse? response)> UpdateCTSP(UpdateCTSPRequest request);
+        Task<(bool success, string message, SanPhamResponse? response)> UpdateSP(SanPhamRequest request);
+        Task<(bool success, string message)> DeleteSP(string maSP);
+    }
+}

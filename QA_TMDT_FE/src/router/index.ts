@@ -28,17 +28,17 @@ const router = createRouter({
         {
           path: "products",
           name: "admin-products",
-          component: () => import("../views/admin/ProductList.vue"),
+          component: () => import("../views/admin/ProductListView.vue"),
         },
         {
           path: "products/new",
           name: "admin-product-new",
-          component: () => import("../views/admin/ProductForm.vue"),
+          component: () => import("../views/admin/ProductFormView.vue"),
         },
         {
           path: "products/:id/edit",
           name: "admin-product-edit",
-          component: () => import("../views/admin/ProductForm.vue"),
+          component: () => import("../views/admin/ProductFormView.vue"),
           props: true,
         },
         {
@@ -49,7 +49,7 @@ const router = createRouter({
         {
           path: "categories",
           name: "admin-categories",
-          component: () => import("../views/admin/CategoryManager.vue"),
+          component: () => import("../views/admin/CategoryManagerView.vue"),
         },
         {
           path: "orders",
@@ -93,24 +93,31 @@ const router = createRouter({
         {
           path: "product/:maSP",
           name: "product-detail",
-          component: () => import("../views/client/ProductDetail.vue"),
+          component: () => import("../views/client/ProductDetailView.vue"),
           props: true,
         },
         {
           path: "search",
           name: "product-search",
-          component: () => import("../views/client/ProductSearch.vue"),
+          component: () => import("../views/client/ProductSearchView.vue"),
         },
         {
           path: "category/:maDM",
           name: "category-products",
-          component: () => import("../views/client/ProductSearch.vue"),
+          component: () => import("../views/client/ProductSearchView.vue"),
           props: true,
+        },
+        {
+          path: "sale",
+          redirect: {
+            name: "product-search",
+            query: { sort: "price-desc" },
+          },
         },
         {
           path: "login",
           name: "client-login",
-          component: () => import("../views/client/ClientAuth.vue"),
+          component: () => import("../views/client/ClientAuthView.vue"),
         },
         {
           path: "cart",
@@ -120,7 +127,7 @@ const router = createRouter({
         {
           path: "checkout",
           name: "checkout",
-          component: () => import("../views/client/Checkout.vue"),
+          component: () => import("../views/client/CheckoutView.vue"),
         },
         {
           path: "order-success/:maDH",
@@ -131,7 +138,12 @@ const router = createRouter({
         {
           path: "orders",
           name: "order-history",
-          component: () => import("../views/client/OrderHistory.vue"),
+          component: () => import("../views/client/OrderHistoryView.vue"),
+        },
+        {
+          path: ":pathMatch(.*)*",
+          name: "client-not-found",
+          component: () => import("../views/client/NotFoundView.vue"),
         },
       ],
     },

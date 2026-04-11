@@ -18,8 +18,8 @@
       <!-- Masonry Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
         <!-- Large left -->
-        <a
-          href="#"
+        <RouterLink
+          to="/search"
           class="group relative overflow-hidden rounded-xl row-span-2 min-h-[400px] md:min-h-[500px]"
         >
           <div
@@ -44,10 +44,10 @@
               riêng biệt.
             </p>
           </div>
-        </a>
+        </RouterLink>
         <!-- Top right -->
-        <a
-          href="#"
+        <RouterLink
+          to="/search"
           class="group relative overflow-hidden rounded-xl min-h-[240px]"
         >
           <div
@@ -63,10 +63,10 @@
             <h3 class="text-lg font-bold text-white">Color Block Trends</h3>
             <p class="text-xs text-white/60 mt-0.5">Sắc màu rực rỡ</p>
           </div>
-        </a>
+        </RouterLink>
         <!-- Bottom right -->
-        <a
-          href="#"
+        <RouterLink
+          to="/search"
           class="group relative overflow-hidden rounded-xl min-h-[240px]"
         >
           <div
@@ -82,18 +82,18 @@
             <h3 class="text-lg font-bold text-white">Evening Elegance</h3>
             <p class="text-xs text-white/60 mt-0.5">Dạ hội sang trọng</p>
           </div>
-        </a>
+        </RouterLink>
       </div>
 
       <!-- Trending This Week -->
       <div class="flex items-center justify-between mb-6">
         <h3 class="text-xl font-bold text-[#111827]">Xu hướng tuần này</h3>
-        <a
-          href="#"
+        <RouterLink
+          to="/search"
           class="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center"
         >
           Xem tất cả <ArrowRightIcon class="w-4 h-4 ml-1" />
-        </a>
+        </RouterLink>
       </div>
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div
@@ -124,6 +124,7 @@
 </template>
 
 <script setup lang="ts">
+import { RouterLink } from "vue-router";
 import {
   ArrowRight as ArrowRightIcon,
   Heart as HeartIcon,

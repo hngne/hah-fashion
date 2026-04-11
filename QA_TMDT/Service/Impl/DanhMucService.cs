@@ -39,6 +39,14 @@ namespace QA_TMDT.Service.Impl
         }
         public async Task<(bool, string, DanhMucResponse?)> PostDM(DanhMucRequest request)
         {
+            request.TenDanhMuc = request.TenDanhMuc.Trim();
+            request.MoTa = string.IsNullOrWhiteSpace(request.MoTa) ? null : request.MoTa.Trim();
+
+            if (string.IsNullOrWhiteSpace(request.TenDanhMuc))
+            {
+                return (false, "Tên danh mục không được để trống", null);
+            }
+
             if (request.MaDanhMucCha.HasValue)
             {
                 var checkCha = await _repo.checkExistDM(request.MaDanhMucCha.Value);
@@ -67,6 +75,14 @@ namespace QA_TMDT.Service.Impl
                 return (false, "Danh mục không tồn tại", null);
             }
 
+            request.TenDanhMuc = request.TenDanhMuc.Trim();
+            request.MoTa = string.IsNullOrWhiteSpace(request.MoTa) ? null : request.MoTa.Trim();
+
+            if (string.IsNullOrWhiteSpace(request.TenDanhMuc))
+            {
+                return (false, "Tên danh mục không được để trống", null);
+            }
+
             if (request.MaDanhMucCha.HasValue)
             {
                 // Rule: Không được chọn cha là chính mình (để tránh vòng lặp vô tận)
@@ -80,6 +96,18 @@ namespace QA_TMDT.Service.Impl
                 if (!checkCha)
                 {
                     return (false, "Danh mục cha không tồn tại", null);
+                }
+
+                var currentParentId = request.MaDanhMucCha;
+                while (currentParentId.HasValue)
+                {
+                    if (currentParentId.Value == madm)
+                    {
+                        return (false, "Không thể chọn danh mục con làm danh mục cha", null);
+                    }
+
+                    var parent = await _repo.GetDMByMaDM(currentParentId.Value);
+                    currentParentId = parent?.MaDanhMucCha;
                 }
             }
 

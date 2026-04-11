@@ -52,6 +52,7 @@ namespace QA_TMDT.Repository.Impl
                 .Include(c => c.ChiTietDhs)
                     .ThenInclude(ctsp => ctsp.MaChiTietSpNavigation)
                         .ThenInclude(bt => bt.MaSpNavigation)
+                        .ThenInclude(sp => sp.AnhSps)
                 .Include(c => c.ChiTietDhs)
                     .ThenInclude(ct => ct.MaChiTietSpNavigation)
                         .ThenInclude(bt => bt.MaMauSacNavigation)

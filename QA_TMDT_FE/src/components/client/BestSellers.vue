@@ -39,9 +39,9 @@
         </RouterLink>
       </div>
       <div class="text-center mt-10">
-        <a href="#" class="inline-flex items-center px-6 py-3 border-2 border-[#111827] text-[#111827] font-bold text-sm rounded-full hover:bg-[#111827] hover:text-white transition">
+        <RouterLink to="/search" class="inline-flex items-center px-6 py-3 border-2 border-[#111827] text-[#111827] font-bold text-sm rounded-full hover:bg-[#111827] hover:text-white transition">
           Xem tất cả sản phẩm <ArrowRightIcon class="w-4 h-4 ml-2" />
-        </a>
+        </RouterLink>
       </div>
     </div>
   </section>
@@ -50,13 +50,15 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { RouterLink } from "vue-router";
+import type { ProductSummary } from "../../types";
 import { ArrowRight as ArrowRightIcon, Star as StarIcon, Loader2 as Loader2Icon } from "lucide-vue-next";
 import { sanPhamService } from "../../services/sanpham.service";
+import { getPageItems } from "../../services/service-helpers";
 
 const tabs = ["Tất cả", "Áo", "Quần", "Phụ kiện"];
 const activeTab = ref("Tất cả");
 const badges = ["HOT", "SALE", null, "HOT", null, "SALE", null, "HOT"];
-const products = ref<any[]>([]);
+const products = ref<ProductSummary[]>([]);
 const loading = ref(true);
 
 const formatPrice = (v: number) => v ? v.toLocaleString("vi-VN") + "đ" : "0đ";
@@ -65,19 +67,19 @@ const filteredProducts = computed(() => {
   if (activeTab.value === "Tất cả") return products.value.slice(0, 8);
   // Simple keyword filter on tenDanhMuc
   const keyword = activeTab.value.toLowerCase();
-  return products.value.filter((sp: any) =>
+  return products.value.filter((sp) =>
     sp.tenDanhMuc?.toLowerCase().includes(keyword)
   ).slice(0, 8);
 });
 
 onMounted(async () => {
   try {
-    const res: any = await sanPhamService.getAll(1, 20);
-    if (res.success && res.data) {
-      products.value = res.data.item || res.data.items || [];
+    const response = await sanPhamService.getAll(1, 20);
+    if (response.success && response.data) {
+      products.value = getPageItems(response.data);
     }
-  } catch (e) {
-    console.warn("Failed to load best sellers", e);
+  } catch {
+    products.value = [];
   } finally {
     loading.value = false;
   }

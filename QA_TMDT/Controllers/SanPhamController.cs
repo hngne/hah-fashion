@@ -73,6 +73,18 @@ namespace QA_TMDT.Controllers
             }
             return Ok(APIResponse<SanPhamResponse>.OK(result.message, result.response!));
         }
+        [HttpPost]
+        [Route("Create-Variant")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> createvariant([FromBody] AddBienTheRequest request)
+        {
+            var result = await _service.CreateVariant(request);
+            if (!result.success)
+            {
+                return BadRequest(APIResponse<ChiTietSanPhamResponse>.Fail(result.message));
+            }
+            return Ok(APIResponse<ChiTietSanPhamResponse>.OK(result.message, result.response!));
+        }
         [HttpPut]
         [Route("Update-stock-ctsp/{maCTSP}")]
         [Authorize(Roles = "admin")]

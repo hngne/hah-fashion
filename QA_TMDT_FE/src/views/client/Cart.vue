@@ -65,7 +65,8 @@
                   </button>
                   <span class="w-10 text-center text-sm font-bold text-[#111827]">{{ item.soLuong }}</span>
                   <button @click="updateQty(item.maCTSP, item.soLuong + 1)"
-                    class="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition">
+                    :disabled="item.soLuong >= item.soLuongTon"
+                    class="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-100 transition disabled:opacity-30">
                     <PlusIcon class="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -136,7 +137,11 @@ const formatPrice = (v: number) => v ? v.toLocaleString("vi-VN") + "đ" : "0đ";
 
 const updateQty = (maCTSP: string, qty: number) => {
   if (qty < 1) return;
-  cartStore.updateQuantity(maCTSP, qty);
+  const currentItem = cartStore.items.find((item) => item.maCTSP === maCTSP);
+  if (!currentItem) return;
+
+  const nextQty = Math.min(qty, currentItem.soLuongTon || qty);
+  cartStore.updateQuantity(maCTSP, nextQty);
 };
 
 const handleCheckout = () => {

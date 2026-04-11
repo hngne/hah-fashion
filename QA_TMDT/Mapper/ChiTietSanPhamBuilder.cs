@@ -11,6 +11,8 @@ namespace QA_TMDT.Mapper
             return new ChiTietSanPhamResponse
             {
                 MaChiTietSP = ctsp.MaChiTietSp,
+                MaKichThuoc = ctsp.MaKichThuoc,
+                MaMauSac = ctsp.MaMauSac,
                 TenMau = ctsp.MaMauSacNavigation?.TenMau ?? "N/a",
                 TenSize = ctsp.MaKichThuocNavigation?.TenSize ?? "N/a",
                 GiaBan = ctsp.GiaBan ?? KhuyenMaiHelper.TinhGiaSauKhuyenMai(ctsp.MaSpNavigation?.GiaGoc ?? 0, ctsp.MaSpNavigation?.ChiTietKms),

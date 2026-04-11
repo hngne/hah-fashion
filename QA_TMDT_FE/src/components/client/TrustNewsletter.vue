@@ -63,11 +63,14 @@
               </button>
             </div>
             <p class="text-[10px] text-white/30 mt-2">
-              Bằng cách đăng ký, bạn đồng ý với
-              <a href="#" class="underline hover:text-white/50"
-                >Chính sách Bảo mật</a
-              >
-              của chúng tôi.
+              Bằng cách đăng ký, bạn đồng ý với chính sách bảo mật của chúng
+              tôi.
+            </p>
+            <p
+              v-if="notice"
+              class="mt-3 rounded-2xl bg-white/10 px-4 py-3 text-xs font-medium text-white/80"
+            >
+              {{ notice }}
             </p>
           </div>
         </div>
@@ -85,8 +88,10 @@ import {
   ShieldCheck as ShieldIcon,
   Headphones as SupportIcon,
 } from "lucide-vue-next";
+import { isValidEmail } from "../../utils/validators";
 
 const email = ref("");
+const notice = ref("");
 
 const trustItems = [
   {
@@ -108,9 +113,17 @@ const trustItems = [
 ];
 
 const subscribe = () => {
-  if (email.value) {
-    alert("Cảm ơn bạn đã đăng ký! 🎉");
-    email.value = "";
+  if (!email.value.trim()) {
+    notice.value = "Vui lòng nhập email để nhận thông báo mới.";
+    return;
   }
+
+  if (!isValidEmail(email.value)) {
+    notice.value = "Email chưa đúng định dạng.";
+    return;
+  }
+
+  notice.value = "Đã ghi nhận email của bạn. Chúng tôi sẽ gửi ưu đãi sớm nhất.";
+  email.value = "";
 };
 </script>

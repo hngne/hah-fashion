@@ -13,7 +13,7 @@ namespace QA_TMDT.Repository.Impl
         }
         public async Task<(List<SanPham> data, int totalItem)> GetAllSP(int page, int pageSize)
         {
-            var query = _context.SanPhams.Include(img => img.AnhSps).Include(dm => dm.MaDanhMucNavigation).Include(km => km.ChiTietKms).ThenInclude(km => km.MaKhuyenMaiNavigation).AsNoTracking();
+            var query = _context.SanPhams.Include(img => img.AnhSps).Include(dm => dm.MaDanhMucNavigation).Include(ctsp => ctsp.ChiTietSps).Include(km => km.ChiTietKms).ThenInclude(km => km.MaKhuyenMaiNavigation).AsNoTracking();
 
             var ToTalItem = await query.CountAsync();
 
@@ -81,7 +81,7 @@ namespace QA_TMDT.Repository.Impl
                 .Select(d => d.MaDanhMuc)
                 .ToListAsync();
 
-            var query = _context.SanPhams.Include(img => img.AnhSps).Include(dm => dm.MaDanhMucNavigation).Include(km => km.ChiTietKms).ThenInclude(m => m.MaKhuyenMaiNavigation).Where(dm => dmDad.Contains((int)dm.MaDanhMuc!)).AsNoTracking();
+            var query = _context.SanPhams.Include(img => img.AnhSps).Include(dm => dm.MaDanhMucNavigation).Include(ctsp => ctsp.ChiTietSps).Include(km => km.ChiTietKms).ThenInclude(m => m.MaKhuyenMaiNavigation).Where(dm => dmDad.Contains((int)dm.MaDanhMuc!)).AsNoTracking();
 
             var ToTalItems = await query.CountAsync();
 
@@ -96,7 +96,7 @@ namespace QA_TMDT.Repository.Impl
         {
             string keySearch = RemoveVNI.ConvertToUnsign(tenSP).ToLower();
 
-            var query = _context.SanPhams.Include(img => img.AnhSps).Include(km => km.ChiTietKms).ThenInclude(m => m.MaKhuyenMaiNavigation).Include(dm => dm.MaDanhMucNavigation).Where(sp => sp.TenTimKiem!.Contains(keySearch)).AsNoTracking();
+            var query = _context.SanPhams.Include(img => img.AnhSps).Include(km => km.ChiTietKms).ThenInclude(m => m.MaKhuyenMaiNavigation).Include(dm => dm.MaDanhMucNavigation).Include(ctsp => ctsp.ChiTietSps).Where(sp => sp.TenTimKiem!.Contains(keySearch)).AsNoTracking();
 
             var ToTalItems = await query.CountAsync();
 

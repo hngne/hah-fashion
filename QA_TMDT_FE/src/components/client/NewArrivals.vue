@@ -3,9 +3,9 @@
     <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between mb-8">
         <h2 class="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight">HÀNG MỚI VỀ</h2>
-        <a href="#" class="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center transition">
+        <RouterLink to="/search" class="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center transition">
           Xem tất cả <ArrowRightIcon class="w-4 h-4 ml-1" />
-        </a>
+        </RouterLink>
       </div>
       <div v-if="loading" class="flex justify-center py-10"><Loader2Icon class="h-6 w-6 animate-spin text-gray-400" /></div>
       <div v-else-if="products.length === 0" class="text-center py-10 text-gray-400 text-sm">Chưa có sản phẩm nào.</div>
@@ -42,10 +42,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { RouterLink } from "vue-router";
+import type { ProductSummary } from "../../types";
 import { ArrowRight as ArrowRightIcon, ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon, Loader2 as Loader2Icon } from "lucide-vue-next";
 import { sanPhamService } from "../../services/sanpham.service";
+import { getPageItems } from "../../services/service-helpers";
 
-const products = ref<any[]>([]);
+const products = ref<ProductSummary[]>([]);
 const loading = ref(true);
 const scrollRef = ref<HTMLElement>();
 
@@ -55,13 +57,12 @@ const scrollRight = () => { scrollRef.value?.scrollBy({ left: 280, behavior: "sm
 
 onMounted(async () => {
   try {
-    const res: any = await sanPhamService.getAll(1, 12);
-    if (res.success && res.data) {
-      // API returns data.item (not items)
-      products.value = res.data.item || res.data.items || [];
+    const response = await sanPhamService.getAll(1, 12);
+    if (response.success && response.data) {
+      products.value = getPageItems(response.data);
     }
-  } catch (e) {
-    console.warn("Failed to load new arrivals", e);
+  } catch {
+    products.value = [];
   } finally {
     loading.value = false;
   }

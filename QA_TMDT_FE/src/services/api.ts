@@ -3,7 +3,7 @@ import axios from "axios";
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "https://localhost:7196/api",
 
-  timeout: 10000,
+  timeout: 15000,
   headers: {
     "Content-Type": "application/json",
     "ngrok-skip-browser-warning": "true",
@@ -15,7 +15,7 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -35,7 +35,15 @@ api.interceptors.response.use(
       // Token hết hạn hoặc không hợp lệ -> Xóa bộ nhớ và điều hướng
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      window.location.href = "/admin/login";
+      const currentPath = window.location.pathname;
+      if (currentPath.startsWith("/admin")) {
+        window.location.assign("/admin/login");
+      } else {
+        const redirect = encodeURIComponent(
+          `${window.location.pathname}${window.location.search}`,
+        );
+        window.location.assign(`/login?redirect=${redirect}`);
+      }
     }
     return Promise.reject(error);
   },

@@ -37,19 +37,19 @@
             {{ slide.subtitle }}
           </p>
           <div class="flex flex-wrap items-center gap-3 mt-8">
-            <a
-              href="#"
+            <RouterLink
+              to="/search"
               class="inline-flex items-center px-6 py-3 bg-white text-[#111827] font-bold text-sm rounded-full hover:bg-gray-100 transition shadow-lg"
             >
               Khám phá ngay
               <ArrowRightIcon class="w-4 h-4 ml-2" />
-            </a>
-            <a
-              href="#"
+            </RouterLink>
+            <RouterLink
+              to="/search"
               class="inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm text-white font-semibold text-sm rounded-full border border-white/20 hover:bg-white/20 transition"
             >
               Xem Lookbook
-            </a>
+            </RouterLink>
           </div>
         </div>
       </div>
@@ -88,6 +88,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
+import { RouterLink } from "vue-router";
 import {
   ArrowRight as ArrowRightIcon,
   ChevronLeft as ChevronLeftIcon,

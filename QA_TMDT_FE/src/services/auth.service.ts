@@ -1,5 +1,10 @@
 import api from "./api";
-import type { DangNhapRequest, DangNhapResponse, APIResponse } from "../types";
+import type {
+  APIResponse,
+  DangNhapRequest,
+  DangNhapResponse,
+  RegisterFormValues,
+} from "../types";
 
 export const authService = {
   login: async (
@@ -8,14 +13,9 @@ export const authService = {
     return await api.post("/Authentication/Login", request);
   },
 
-  register: async (data: {
-    tenDangNhap: string;
-    matKhau: string;
-    email?: string;
-    hoTen?: string;
-    soDienThoai?: string;
-    diaChi?: string;
-  }): Promise<APIResponse<DangNhapResponse>> => {
+  register: async (
+    data: RegisterFormValues,
+  ): Promise<APIResponse<DangNhapResponse>> => {
     return await api.post("/Authentication/Register", data);
   },
 };

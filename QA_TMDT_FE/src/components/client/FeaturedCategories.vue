@@ -4,12 +4,12 @@
       <h2 class="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight">
         Danh mục nổi bật
       </h2>
-      <a
-        href="#"
+      <RouterLink
+        to="/search"
         class="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center transition"
       >
         Xem tất cả <ArrowRightIcon class="w-4 h-4 ml-1" />
-      </a>
+      </RouterLink>
     </div>
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
       <RouterLink
@@ -41,10 +41,11 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { RouterLink } from "vue-router";
+import type { CategoryItem } from "../../types";
 import { ArrowRight as ArrowRightIcon } from "lucide-vue-next";
 import { danhMucService } from "../../services/danhmuc.service";
 
-const categories = ref<any[]>([]);
+const categories = ref<CategoryItem[]>([]);
 
 // Fallback cover images for categories
 const defaultCovers = [
@@ -63,14 +64,14 @@ const displayCategories = computed(() =>
 
 onMounted(async () => {
   try {
-    const res: any = await danhMucService.getAll();
-    if (res.success) {
-      categories.value = (res.data || [])
-        .filter((c: any) => !c.maDanhMucCha)
+    const response = await danhMucService.getAll();
+    if (response.success) {
+      categories.value = (response.data || [])
+        .filter((category: CategoryItem) => !category.maDanhMucCha)
         .slice(0, 4);
     }
-  } catch (e) {
-    console.warn("Failed to load categories", e);
+  } catch {
+    categories.value = [];
   }
 });
 </script>

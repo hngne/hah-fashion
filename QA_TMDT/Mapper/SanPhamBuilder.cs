@@ -12,6 +12,7 @@ namespace QA_TMDT.Mapper
             {
                 MaSp = s.MaSp,
                 TenSp = s.TenSp,
+                MaDanhMuc = s.MaDanhMuc,
                 TenDanhMuc = s.MaDanhMucNavigation?.TenDanhMuc ?? "N/a",
                 GiaGoc = s.GiaGoc,
                 GiaKm = KhuyenMaiHelper.TinhGiaSauKhuyenMai(s.GiaGoc, s.ChiTietKms),
@@ -19,6 +20,7 @@ namespace QA_TMDT.Mapper
                 MoTa = s.MoTa,
                 ChatLieu = s.ChatLieu,
                 AnhDaiDien = s.AnhSps.FirstOrDefault()?.DuongDan,
+                SoBienThe = s.ChiTietSps.Count,
                 DuongDanAnhSPs = s.AnhSps.Select(img => img.DuongDan).ToList(),
                 DsBienThe = s.ChiTietSps.Select(ChiTietSanPhamBuilder.ToResponse).ToList(),
             };

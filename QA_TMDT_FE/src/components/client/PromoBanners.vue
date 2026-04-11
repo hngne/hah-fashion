@@ -7,8 +7,8 @@
     </h2>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
       <!-- Banner 1: Sale -->
-      <a
-        href="#"
+      <RouterLink
+        to="/sale"
         class="group relative overflow-hidden rounded-xl h-[280px] sm:h-[350px]"
       >
         <div
@@ -33,10 +33,10 @@
             Mua ngay
           </span>
         </div>
-      </a>
+      </RouterLink>
       <!-- Banner 2: Collection -->
-      <a
-        href="#"
+      <RouterLink
+        to="/search"
         class="group relative overflow-hidden rounded-xl h-[280px] sm:h-[350px]"
       >
         <div
@@ -61,9 +61,11 @@
             Khám phá
           </span>
         </div>
-      </a>
+      </RouterLink>
     </div>
   </section>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { RouterLink } from "vue-router";
+</script>

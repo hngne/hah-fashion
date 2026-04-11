@@ -30,7 +30,7 @@
       class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3"
     >
       <div
-        v-for="(s, idx) in list"
+        v-for="s in list"
         :key="s.maSize"
         class="bg-white rounded-xl border border-gray-200 p-4 flex flex-col items-center group hover:border-blue-300 hover:shadow-sm transition-all"
       >

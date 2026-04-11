@@ -1,30 +1,44 @@
 import api from "./api";
+import type { APIResponse, CheckoutFormValues, Order } from "../types";
 
 export const donHangService = {
   // Admin: get all orders (used by both OrderManager and Dashboard)
-  getAll: () => api.get("/DonHang/Admin-getAll"),
-  getAllAdmin: () => api.get("/DonHang/Admin-getAll"),
+  getAll: async (): Promise<APIResponse<Order[]>> =>
+    api.get("/DonHang/Admin-getAll"),
+  getAllAdmin: async (): Promise<APIResponse<Order[]>> =>
+    api.get("/DonHang/Admin-getAll"),
   // Get order by ID (detail)
-  getById: (maDH: string) => api.get(`/DonHang/get-dh-by/${maDH}`),
+  getById: async (maDH: string): Promise<APIResponse<Order>> =>
+    api.get(`/DonHang/get-dh-by/${maDH}`),
   // Update order status (admin)
-  updateStatus: (maDH: string, trangThaiMoi: string) =>
+  updateStatus: async (
+    maDH: string,
+    trangThaiMoi: string,
+  ): Promise<APIResponse<Order>> =>
     api.put(`/DonHang/trangthai/${maDH}`, { trangThaiMoi }),
   // Delete order (admin)
-  delete: (maDH: string) => api.delete(`/DonHang?maDH=${maDH}`),
+  delete: async (maDH: string): Promise<APIResponse<string>> =>
+    api.delete(`/DonHang?maDH=${maDH}`),
 
   // ===== CLIENT =====
   // Create order from cart
-  createOrder: (data: {
-    maPTTT: number;
-    maPTVC: number;
-    maVoucher?: string;
-    tenNguoiNhan?: string;
-    soDienThoai: string;
-    diaChiGiaoHang: string;
-  }) => api.post("/DonHang", data),
+  createOrder: async (
+    data: CheckoutFormValues,
+  ): Promise<APIResponse<Order>> => api.post("/DonHang", data),
   // Get user's orders
-  getMyOrders: (matk: string) => api.get(`/DonHang/get-by/${matk}`),
+  getMyOrders: async (): Promise<APIResponse<Order[]>> =>
+    api.get("/DonHang/get-by/ignored"),
   // Cancel order
-  cancelOrder: (maDH: string, lyDoHuy: string) =>
-    api.put(`/DonHang/huydon/${maDH}`, { lyDoHuy }),
+  cancelOrder: async (
+    maDH: string,
+    lyDoHuy: string,
+  ): Promise<APIResponse<Order>> => {
+    const rawUser = localStorage.getItem("user");
+    const user = rawUser ? (JSON.parse(rawUser) as { maTaiKhoan?: string }) : null;
+
+    return api.put(`/DonHang/huydon/${maDH}`, {
+      maTaiKhoan: user?.maTaiKhoan || "",
+      lyDoHuy,
+    });
+  },
 };

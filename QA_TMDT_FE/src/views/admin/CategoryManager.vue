@@ -326,7 +326,7 @@ const handleSave = async () => {
     const payload = {
       tenDanhMuc: form.value.tenDanhMuc,
       moTa: form.value.moTa || undefined,
-      maDanhMucCha: form.value.maDanhMucCha || undefined,
+      maDanhMucCha: form.value.maDanhMucCha || null,
     };
     const res: any =
       editing.value && editId.value !== null

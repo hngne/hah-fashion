@@ -1,8 +1,9 @@
 import api from "./api";
+import type { APIResponse, Voucher } from "../types";
 
 export const voucherService = {
-  getAll: () => api.get("/Voucher"),
-  getByCode: (maVoucher: string) =>
+  getAll: async (): Promise<APIResponse<Voucher[]>> => api.get("/Voucher"),
+  getByCode: async (maVoucher: string): Promise<APIResponse<Voucher>> =>
     api.get(`/Voucher/by-mavoucher/${maVoucher}`),
   create: (data: {
     maVoucher: string;
@@ -25,6 +26,8 @@ export const voucherService = {
   delete: (maVoucher: string) => api.delete(`/Voucher?maVoucher=${maVoucher}`),
 
   // Client: get vouchers available for user
-  getAvailableForUser: (maTK: string) =>
+  getAvailableForUser: async (
+    maTK: string,
+  ): Promise<APIResponse<Voucher[]>> =>
     api.get(`/Voucher/avaiable-user-canuse/${maTK}`),
 };

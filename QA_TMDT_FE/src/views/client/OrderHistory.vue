@@ -159,7 +159,7 @@ const confirmCancel = async () => {
 const loadOrders = async () => {
   if (!authStore.user?.maTaiKhoan) return;
   try {
-    const res: any = await donHangService.getMyOrders(authStore.user.maTaiKhoan);
+    const res: any = await donHangService.getMyOrders();
     if (res.success && res.data) {
       orders.value = res.data;
     }

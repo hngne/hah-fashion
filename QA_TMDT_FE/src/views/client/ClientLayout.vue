@@ -49,7 +49,7 @@
             </div>
 
             <RouterLink to="/sale" class="px-3 py-2 text-sm font-bold text-red-500 hover:text-red-600 transition rounded-md hover:bg-red-50">
-              🔥 Sale
+              Sale
             </RouterLink>
           </nav>
 
@@ -144,7 +144,7 @@
             </div>
             <RouterLink to="/sale" @click="mobileOpen = false"
               class="block px-3 py-2 text-sm font-bold text-red-500 hover:bg-red-50 rounded-lg">
-              🔥 KHUYẾN MÃI
+              KHUYEN MAI
             </RouterLink>
           </div>
         </div>
@@ -164,27 +164,27 @@
             <span class="text-lg font-extrabold"><span class="text-blue-400">HaH</span>Fashion</span>
             <p class="text-sm text-white/50 mt-3 leading-relaxed">Thời trang hiện đại cho mọi phong cách. Chất lượng cao, giá hợp lý.</p>
             <div class="flex space-x-3 mt-4">
-              <a href="#" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-blue-500 hover:text-white transition"><FacebookIcon class="w-4 h-4" /></a>
-              <a href="#" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-pink-500 hover:text-white transition"><InstagramIcon class="w-4 h-4" /></a>
-              <a href="#" class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/60 hover:bg-blue-400 hover:text-white transition"><MailIcon class="w-4 h-4" /></a>
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/60"><FacebookIcon class="w-4 h-4" /></span>
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/60"><InstagramIcon class="w-4 h-4" /></span>
+              <a href="mailto:support@hahfashion.vn" class="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/60 transition hover:bg-blue-400 hover:text-white"><MailIcon class="w-4 h-4" /></a>
             </div>
           </div>
           <div>
             <h4 class="text-sm font-bold uppercase tracking-wider text-white/80 mb-4">Hỗ trợ</h4>
             <ul class="space-y-2 text-sm text-white/50">
-              <li><a href="#" class="hover:text-white transition">Hướng dẫn mua hàng</a></li>
-              <li><a href="#" class="hover:text-white transition">Chính sách đổi trả</a></li>
-              <li><a href="#" class="hover:text-white transition">Chính sách bảo hành</a></li>
-              <li><a href="#" class="hover:text-white transition">Câu hỏi thường gặp</a></li>
+              <li class="transition hover:text-white">Hướng dẫn mua hàng</li>
+              <li class="transition hover:text-white">Chính sách đổi trả</li>
+              <li class="transition hover:text-white">Chính sách bảo hành</li>
+              <li class="transition hover:text-white">Câu hỏi thường gặp</li>
             </ul>
           </div>
           <div>
             <h4 class="text-sm font-bold uppercase tracking-wider text-white/80 mb-4">Chính sách</h4>
             <ul class="space-y-2 text-sm text-white/50">
-              <li><a href="#" class="hover:text-white transition">Điều khoản sử dụng</a></li>
-              <li><a href="#" class="hover:text-white transition">Chính sách bảo mật</a></li>
-              <li><a href="#" class="hover:text-white transition">Chính sách vận chuyển</a></li>
-              <li><a href="#" class="hover:text-white transition">Phương thức thanh toán</a></li>
+              <li class="transition hover:text-white">Điều khoản sử dụng</li>
+              <li class="transition hover:text-white">Chính sách bảo mật</li>
+              <li class="transition hover:text-white">Chính sách vận chuyển</li>
+              <li class="transition hover:text-white">Phương thức thanh toán</li>
             </ul>
           </div>
           <div>
@@ -216,6 +216,7 @@ import { danhMucService } from "../../services/danhmuc.service";
 import { useAuthStore } from "../../stores/auth";
 import { useCartStore } from "../../stores/cart";
 import logoSrc from "../../assets/client/logo.png";
+import type { CategoryItem } from "../../types";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -241,28 +242,28 @@ const handleLogout = () => {
 const mobileOpen = ref(false);
 const mobileExpanded = ref<number | null>(null);
 const openMega = ref<number | null>(null);
-const allCategories = ref<any[]>([]);
+const allCategories = ref<CategoryItem[]>([]);
 
 // Logo from assets/client/logo.png
 const logoUrl = ref(logoSrc);
 
 // Root categories (no parent)
 const rootCategories = computed(() =>
-  allCategories.value.filter((c: any) => !c.maDanhMucCha)
+  allCategories.value.filter((category) => !category.maDanhMucCha)
 );
 
 // Get children of a category
 const getChildren = (parentId: number) =>
-  allCategories.value.filter((c: any) => c.maDanhMucCha === parentId);
+  allCategories.value.filter((category) => category.maDanhMucCha === parentId);
 
 onMounted(async () => {
   try {
-    const res: any = await danhMucService.getAll();
-    if (res.success) {
-      allCategories.value = res.data || [];
+    const response = await danhMucService.getAll();
+    if (response.success) {
+      allCategories.value = response.data || [];
     }
-  } catch (e) {
-    console.warn("Failed to load categories for nav", e);
+  } catch {
+    allCategories.value = [];
   }
 });
 </script>

@@ -60,7 +60,7 @@ namespace QA_TMDT.Controllers
 
         [HttpPut("admin/role/{maTK}")]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> UpdateRole(string maTK, string newRole)
+        public async Task<IActionResult> UpdateRole(string maTK, [FromQuery][Required(ErrorMessage = "Vai trò mới không được để trống")] string newRole)
         {
             var result = await _service.UpdateRole(maTK, newRole);
             if (!result.success)

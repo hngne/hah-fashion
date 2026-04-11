@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using QA_TMDT.Helper;
@@ -23,7 +24,40 @@ namespace QA_TMDT
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .ConfigureApiBehaviorOptions(options =>
+                {
+                    options.InvalidModelStateResponseFactory = context =>
+                    {
+                        var errors = context.ModelState
+                            .Where(entry => entry.Value?.Errors.Count > 0)
+                            .SelectMany(entry => entry.Value!.Errors.Select(error => new
+                            {
+                                Field = NormalizeValidationKey(entry.Key),
+                                Error = string.IsNullOrWhiteSpace(error.ErrorMessage)
+                                    ? "Giá trị không hợp lệ"
+                                    : error.ErrorMessage
+                            }))
+                            .GroupBy(item => item.Field)
+                            .ToDictionary(
+                                group => group.Key,
+                                group => group.Select(item => item.Error).Distinct().ToArray());
+
+                        var message = errors.Count > 0
+                            ? string.Join(" | ", errors.SelectMany(group => group.Value.Select(error => $"{group.Key}: {error}")))
+                            : "Dữ liệu đầu vào không hợp lệ";
+
+                        return new BadRequestObjectResult(new APIResponse<object>
+                        {
+                            Success = false,
+                            Message = message,
+                            Data = new
+                            {
+                                errors
+                            }
+                        });
+                    };
+                });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -143,6 +177,27 @@ namespace QA_TMDT
             app.MapControllers();
 
             app.Run();
+        }
+
+        private static string NormalizeValidationKey(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return "request";
+            }
+
+            var normalizedKey = key;
+            if (normalizedKey.StartsWith("request.", StringComparison.OrdinalIgnoreCase))
+            {
+                normalizedKey = normalizedKey["request.".Length..];
+            }
+
+            if (normalizedKey.StartsWith("$.", StringComparison.OrdinalIgnoreCase))
+            {
+                normalizedKey = normalizedKey[2..];
+            }
+
+            return normalizedKey;
         }
     }
 }

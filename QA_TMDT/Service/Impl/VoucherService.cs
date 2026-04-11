@@ -48,8 +48,8 @@ namespace QA_TMDT.Service.Impl
             newVoucher.MaVoucher = request.MaVoucher;
             newVoucher.TenVoucher = request.TenVoucher;
             newVoucher.GiamGia = request.GiamGia;
-            newVoucher.NgayBatDau = request.NgayBatDau;
-            newVoucher.NgayKetThuc = request.NgayKetThuc;
+            newVoucher.NgayBatDau = request.NgayBatDau!.Value;
+            newVoucher.NgayKetThuc = request.NgayKetThuc!.Value;
             newVoucher.DieuKienApDung = request.DieuKienApDung;
             newVoucher.MoTa = request.MoTa;
             var success = await _repo.CreateVoucher(newVoucher);
@@ -80,8 +80,8 @@ namespace QA_TMDT.Service.Impl
             exist.TenVoucher = request.TenVoucher;
             exist.GiamGia = request.GiamGia;
             exist.DieuKienApDung = request.DieuKienApDung;
-            exist.NgayBatDau = request.NgayBatDau;
-            exist.NgayKetThuc = request.NgayKetThuc;
+            exist.NgayBatDau = request.NgayBatDau!.Value;
+            exist.NgayKetThuc = request.NgayKetThuc!.Value;
             exist.MoTa = request.MoTa;
 
             var success = await _repo.UpdateVoucher(exist);

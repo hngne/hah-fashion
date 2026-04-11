@@ -78,9 +78,9 @@ namespace QA_TMDT.Service.Impl
                 var chitietsp = new ChiTietSp();
                 chitietsp.MaChiTietSp = Guid.NewGuid().ToString();
                 chitietsp.MaSp = request.MaSp;
-                chitietsp.MaKichThuoc = ctsp.MaKichThuoc;
-                chitietsp.MaMauSac = ctsp.MaMauSac;
-                chitietsp.SoLuongTon = ctsp.SoLuongTon;
+                chitietsp.MaKichThuoc = ctsp.MaKichThuoc!.Value;
+                chitietsp.MaMauSac = ctsp.MaMauSac!.Value;
+                chitietsp.SoLuongTon = ctsp.SoLuongTon!.Value;
                 chitietsp.GiaBan = ctsp.GiaBan;
                 ChiTietSPs.Add(chitietsp);
             }
@@ -89,7 +89,7 @@ namespace QA_TMDT.Service.Impl
             sp.MaSp = request.MaSp;
             sp.TenSp = request.TenSp;
             sp.MoTa = request.MoTa;
-            sp.GiaGoc = request.GiaGoc;
+            sp.GiaGoc = request.GiaGoc!.Value;
             sp.ChatLieu = request.ChatLieu;
             sp.MaDanhMuc = request.MaDanhMuc;
             sp.TenTimKiem = RemoveVNI.ConvertToUnsign(request.TenSp);
@@ -126,9 +126,9 @@ namespace QA_TMDT.Service.Impl
             var newBienThe = new ChiTietSp();
             newBienThe.MaChiTietSp =  Guid.NewGuid().ToString();
             newBienThe.MaSp = request.MaSP;
-            newBienThe.MaKichThuoc = request.MaKichThuoc;
-            newBienThe.MaMauSac = request.MaMauSac;
-            newBienThe.SoLuongTon = request.SoLuongTon;
+            newBienThe.MaKichThuoc = request.MaKichThuoc!.Value;
+            newBienThe.MaMauSac = request.MaMauSac!.Value;
+            newBienThe.SoLuongTon = request.SoLuongTon!.Value;
             newBienThe.GiaBan = request.GiaBan;
 
             var success = await _repo.CreateVariant(newBienThe);
@@ -210,7 +210,7 @@ namespace QA_TMDT.Service.Impl
             sp.TenSp = request.TenSp;
             sp.MoTa = request.MoTa;
             sp.MaDanhMuc = request.MaDanhMuc;
-            sp.GiaGoc = request.GiaGoc;
+            sp.GiaGoc = request.GiaGoc!.Value;
             sp.ChatLieu = request.ChatLieu;
             sp.TenTimKiem = RemoveVNI.ConvertToUnsign(request.TenSp);
 
@@ -240,7 +240,7 @@ namespace QA_TMDT.Service.Impl
             }
             var ctsp = await _repo.GetChiTietSPByMaCTSP(request.MaChiTietSp);
             ctsp.GiaBan = request.GiaBan;
-            ctsp.SoLuongTon = request.SoLuongTon;
+            ctsp.SoLuongTon = request.SoLuongTon!.Value;
             var success = await _repo.UpdateCTSP(ctsp);
             if (!success)
             {

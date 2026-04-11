@@ -40,8 +40,8 @@ namespace QA_TMDT.Service.Impl
             var newKM = new KhuyenMai();
             newKM.MaKhuyenMai = request.MaKhuyenMai;
             newKM.TenKhuyenMai = request.TenKhuyenMai;
-            newKM.NgayKetThuc = request.NgayKetThuc;
-            newKM.NgayBatDau = request.NgayBatDau;
+            newKM.NgayKetThuc = request.NgayKetThuc!.Value;
+            newKM.NgayBatDau = request.NgayBatDau!.Value;
             newKM.MoTa = request.MoTa;
             var data = await _repo.PostKM(newKM);
             if (!data)
@@ -62,8 +62,8 @@ namespace QA_TMDT.Service.Impl
                 return (false, "Nhập sai về ngày khuyến mãi", null);
             }
             exist.TenKhuyenMai = request.TenKhuyenMai;
-            exist.NgayBatDau = request.NgayBatDau;
-            exist.NgayKetThuc = request.NgayKetThuc;
+            exist.NgayBatDau = request.NgayBatDau!.Value;
+            exist.NgayKetThuc = request.NgayKetThuc!.Value;
             exist.MoTa = request.MoTa;
             var success = await _repo.UpdateKM(exist);
             if (!success)

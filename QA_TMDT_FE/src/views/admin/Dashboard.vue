@@ -345,6 +345,7 @@ import { thongKeService } from "../../services/thongke.service";
 import { donHangService } from "../../services/donhang.service";
 import { taiKhoanService } from "../../services/taikhoan.service";
 import { sanPhamService } from "../../services/sanpham.service";
+import { getTotalItems } from "../../services/service-helpers";
 
 ChartJS.register(
   CategoryScale,
@@ -574,7 +575,7 @@ const fetchAll = async () => {
       await Promise.allSettled([
         donHangService.getAllAdmin(),
         taiKhoanService.getAllAdmin(),
-        sanPhamService.getAll(1, 1000),
+        sanPhamService.getAll(1, 1),
         thongKeService.getTopBanChay(5),
         thongKeService.getTopE(5),
       ]);
@@ -594,7 +595,7 @@ const fetchAll = async () => {
       totalUsers.value = (usersRes.value.data || []).length;
     if (productsRes.status === "fulfilled" && productsRes.value?.success) {
       const d = productsRes.value.data;
-      totalProducts.value = d?.totalCount || d?.items?.length || 0;
+      totalProducts.value = getTotalItems(d);
     }
     if (topChayRes.status === "fulfilled" && topChayRes.value?.success)
       topBanChay.value = topChayRes.value.data || [];

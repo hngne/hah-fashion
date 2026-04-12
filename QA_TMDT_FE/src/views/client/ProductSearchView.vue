@@ -254,7 +254,12 @@ import {
 } from "lucide-vue-next";
 import CatalogFilterPanel from "../../components/client/CatalogFilterPanel.vue";
 import { danhMucService } from "../../services/danhmuc.service";
-import { extractErrorMessage, getPageItems } from "../../services/service-helpers";
+import {
+  extractErrorMessage,
+  getPageItems,
+  getTotalItems,
+  getTotalPages,
+} from "../../services/service-helpers";
 import { sanPhamService } from "../../services/sanpham.service";
 import type { CategoryItem, ProductSummary } from "../../types";
 
@@ -263,10 +268,13 @@ const router = useRouter();
 const props = defineProps<{ maDM?: string }>();
 
 const PAGE_SIZE = 12;
+const FETCH_BATCH_SIZE = 20;
 const placeholderImage = "https://via.placeholder.com/400x533?text=No+Image";
 
 const categories = ref<CategoryItem[]>([]);
 const products = ref<ProductSummary[]>([]);
+const totalItems = ref(0);
+const serverTotalPages = ref(1);
 const loading = ref(true);
 const errorMessage = ref("");
 const searchInput = ref("");
@@ -287,6 +295,10 @@ const sortValue = ref("default");
 
 const priceKey = computed(() =>
   typeof route.query.price === "string" ? route.query.price : "",
+);
+
+const useClientAggregation = computed(() =>
+  Boolean(priceKey.value) || sortValue.value !== "default",
 );
 
 const currentPage = computed(() => {
@@ -316,22 +328,21 @@ const pageTitle = computed(() => {
   return "Tất cả sản phẩm";
 });
 
-const pricedProducts = computed(() => {
+const processedProducts = computed(() => {
+  let items = [...products.value];
   const key = priceKey.value;
-  if (!key) return products.value;
 
-  return products.value.filter((product) => {
-    const price = product.giaKm || product.giaGoc;
-    if (key === "under-200") return price < 200000;
-    if (key === "200-500") return price >= 200000 && price < 500000;
-    if (key === "500-1000") return price >= 500000 && price < 1000000;
-    if (key === "over-1000") return price >= 1000000;
-    return true;
-  });
-});
+  if (key) {
+    items = items.filter((product) => {
+      const price = product.giaKm || product.giaGoc;
+      if (key === "under-200") return price < 200000;
+      if (key === "200-500") return price >= 200000 && price < 500000;
+      if (key === "500-1000") return price >= 500000 && price < 1000000;
+      if (key === "over-1000") return price >= 1000000;
+      return true;
+    });
+  }
 
-const sortedProducts = computed(() => {
-  const items = [...pricedProducts.value];
   if (sortValue.value === "price-asc") {
     items.sort((a, b) => (a.giaKm || a.giaGoc) - (b.giaKm || b.giaGoc));
   } else if (sortValue.value === "price-desc") {
@@ -342,15 +353,25 @@ const sortedProducts = computed(() => {
   return items;
 });
 
-const totalFilteredItems = computed(() => sortedProducts.value.length);
+const totalFilteredItems = computed(() =>
+  useClientAggregation.value ? processedProducts.value.length : totalItems.value,
+);
 
-const totalPages = computed(() => Math.max(1, Math.ceil(totalFilteredItems.value / PAGE_SIZE)));
+const totalPages = computed(() =>
+  useClientAggregation.value
+    ? Math.max(1, Math.ceil(totalFilteredItems.value / PAGE_SIZE))
+    : Math.max(1, serverTotalPages.value),
+);
 
 const safePage = computed(() => Math.min(currentPage.value, totalPages.value));
 
 const paginatedProducts = computed(() => {
+  if (!useClientAggregation.value) {
+    return products.value;
+  }
+
   const start = (safePage.value - 1) * PAGE_SIZE;
-  return sortedProducts.value.slice(start, start + PAGE_SIZE);
+  return processedProducts.value.slice(start, start + PAGE_SIZE);
 });
 
 const visiblePages = computed(() => {
@@ -385,22 +406,61 @@ async function loadCategories() {
   categories.value = response.data ?? [];
 }
 
+async function fetchProductPage(page: number, pageSize: number) {
+  if (activeSearchQuery.value) {
+    return sanPhamService.searchByName(activeSearchQuery.value, page, pageSize);
+  }
+
+  if (activeCategoryId.value) {
+    return sanPhamService.getByCategory(activeCategoryId.value, page, pageSize);
+  }
+
+  return sanPhamService.getAll(page, pageSize);
+}
+
+async function loadAllMatchingProducts() {
+  const firstResponse = await fetchProductPage(1, FETCH_BATCH_SIZE);
+  const firstPage = firstResponse.data;
+  const mergedItems = [...getPageItems(firstPage)];
+  const totalPageCount = getTotalPages(firstPage);
+
+  for (let page = 2; page <= totalPageCount; page += 1) {
+    const response = await fetchProductPage(page, FETCH_BATCH_SIZE);
+    mergedItems.push(...getPageItems(response.data));
+  }
+
+  return {
+    items: mergedItems,
+    totalItemCount: getTotalItems(firstPage),
+  };
+}
+
 async function loadProducts() {
   loading.value = true;
   errorMessage.value = "";
   try {
-    const response = activeSearchQuery.value
-      ? await sanPhamService.searchByName(activeSearchQuery.value, 1, 500)
-      : activeCategoryId.value
-        ? await sanPhamService.getByCategory(activeCategoryId.value, 1, 500)
-        : await sanPhamService.getAll(1, 500);
+    if (useClientAggregation.value) {
+      const { items, totalItemCount } = await loadAllMatchingProducts();
+      products.value = items;
+      totalItems.value = totalItemCount;
+      serverTotalPages.value = Math.max(1, Math.ceil(totalItemCount / PAGE_SIZE));
+      return;
+    }
 
-    products.value = getPageItems(response.data);
+    const response = await fetchProductPage(currentPage.value, PAGE_SIZE);
+    const page = response.data;
+
+    products.value = getPageItems(page);
+    totalItems.value = getTotalItems(page);
+    serverTotalPages.value = getTotalPages(page);
   } catch (caughtError) {
     errorMessage.value = extractErrorMessage(
       caughtError,
       "Không thể tải dữ liệu sản phẩm.",
     );
+    products.value = [];
+    totalItems.value = 0;
+    serverTotalPages.value = 1;
   } finally {
     loading.value = false;
   }

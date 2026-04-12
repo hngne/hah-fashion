@@ -8,24 +8,34 @@ import type {
   UpdateVariantPayload,
 } from "../types";
 
+interface ProductListParams {
+  minPrice?: number;
+  maxPrice?: number;
+  maKichThuoc?: number;
+  maMauSac?: number;
+}
+
 export const sanPhamService = {
   getAll: async (
     page = 1,
     pageSize = 10,
+    filters: ProductListParams = {},
   ): Promise<APIResponse<PageResult<ProductSummary>>> =>
-    api.get("/SanPham/GetAllSP", { params: { page, pageSize } }),
+    api.get("/SanPham/GetAllSP", { params: { page, pageSize, ...filters } }),
   getByCategory: async (
     maDM: number,
     page = 1,
     pageSize = 10,
+    filters: ProductListParams = {},
   ): Promise<APIResponse<PageResult<ProductSummary>>> =>
-    api.get(`/SanPham/Get-by-maDM/${maDM}`, { params: { page, pageSize } }),
+    api.get(`/SanPham/Get-by-maDM/${maDM}`, { params: { page, pageSize, ...filters } }),
   searchByName: async (
     tenSP: string,
     page = 1,
     pageSize = 10,
+    filters: ProductListParams = {},
   ): Promise<APIResponse<PageResult<ProductSummary>>> =>
-    api.get(`/SanPham/Get-by-tenSP/${tenSP}`, { params: { page, pageSize } }),
+    api.get(`/SanPham/Get-by-tenSP/${tenSP}`, { params: { page, pageSize, ...filters } }),
   getFullInfo: async (maSP: string): Promise<APIResponse<ProductDetail>> =>
     api.get(`/SanPham/Get-fullinfo-by-maSP/${maSP}`),
   create: async (formData: FormData): Promise<APIResponse<ProductDetail>> =>

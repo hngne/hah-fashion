@@ -20,23 +20,23 @@ namespace QA_TMDT.Controllers
         }
         [HttpGet]
         [Route("GetAllSP")]
-        public async Task<IActionResult> getallsp([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> getallsp([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null)
         {
-            var result = await _service.GetAllSP(page, pageSize);
+            var result = await _service.GetAllSP(page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
             return Ok(APIResponse<PageResult<SanPhamResponse>>.OK("Lấy danh sách sản phẩm thành công", result));
         }
         [HttpGet]
         [Route("Get-by-maDM/{maDM}")]
-        public async Task<IActionResult> getbymadm([FromRoute] int maDM, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> getbymadm([FromRoute] int maDM, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null)
         {
-            var result = await _service.GetByMaDM(maDM, page, pageSize);
+            var result = await _service.GetByMaDM(maDM, page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
             return Ok(APIResponse<PageResult<SanPhamResponse>>.OK("Lấy danh sách sản phẩm theo mã danh mục thành công", result));
         }
         [HttpGet]
         [Route("Get-by-tenSP/{tenSP}")]
-        public async Task<IActionResult> getbytensp([FromRoute] string tenSP, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> getbytensp([FromRoute] string tenSP, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null)
         {
-            var result = await _service.GetByTenSP(tenSP, page, pageSize);
+            var result = await _service.GetByTenSP(tenSP, page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
             return Ok(APIResponse<PageResult<SanPhamResponse>>.OK("Lấy danh sách sản phẩm theo tên sản phẩm thành công", result));
         }
         [HttpGet]

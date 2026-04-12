@@ -11,14 +11,64 @@ namespace QA_TMDT.Repository.Impl
         {
             _context = context;
         }
-        public async Task<(List<SanPham> data, int totalItem)> GetAllSP(int page, int pageSize)
+        private IQueryable<SanPham> BuildBaseQuery()
         {
-            var query = _context.SanPhams.Include(img => img.AnhSps).Include(dm => dm.MaDanhMucNavigation).Include(ctsp => ctsp.ChiTietSps).Include(km => km.ChiTietKms).ThenInclude(km => km.MaKhuyenMaiNavigation).AsNoTracking();
+            return _context.SanPhams
+                .Include(img => img.AnhSps)
+                .Include(dm => dm.MaDanhMucNavigation)
+                .Include(ctsp => ctsp.ChiTietSps)
+                .Include(km => km.ChiTietKms).ThenInclude(km => km.MaKhuyenMaiNavigation)
+                .AsNoTracking();
+        }
+
+        private IQueryable<SanPham> ApplyPriceFilter(IQueryable<SanPham> query, decimal? minPrice, decimal? maxPrice)
+        {
+            if (!minPrice.HasValue && !maxPrice.HasValue)
+            {
+                return query;
+            }
+
+            var now = DateTime.Now;
+
+            return
+                from sp in query
+                let maxDiscount = sp.ChiTietKms
+                    .Where(ct =>
+                        ct.MaKhuyenMaiNavigation != null &&
+                        ct.MaKhuyenMaiNavigation.NgayBatDau <= now &&
+                        ct.MaKhuyenMaiNavigation.NgayKetThuc >= now)
+                    .Select(ct => (int?)ct.PhanTramGiam)
+                    .Max() ?? 0
+                let finalPrice = sp.GiaGoc - (sp.GiaGoc * maxDiscount / 100m)
+                where (!minPrice.HasValue || finalPrice >= minPrice.Value)
+                    && (!maxPrice.HasValue || finalPrice < maxPrice.Value)
+                select sp;
+        }
+
+        private IQueryable<SanPham> ApplyVariantFilter(IQueryable<SanPham> query, int? maKichThuoc, int? maMauSac)
+        {
+            if (!maKichThuoc.HasValue && !maMauSac.HasValue)
+            {
+                return query;
+            }
+
+            return query.Where(sp =>
+                sp.ChiTietSps.Any(ct =>
+                    (!maKichThuoc.HasValue || ct.MaKichThuoc == maKichThuoc.Value) &&
+                    (!maMauSac.HasValue || ct.MaMauSac == maMauSac.Value)));
+        }
+
+        public async Task<(List<SanPham> data, int totalItem)> GetAllSP(int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
+        {
+            var query = ApplyVariantFilter(
+                ApplyPriceFilter(BuildBaseQuery(), minPrice, maxPrice),
+                maKichThuoc,
+                maMauSac
+            );
 
             var ToTalItem = await query.CountAsync();
 
             var Items = await query
-                .AsNoTracking()
                 .OrderByDescending(p => p.TenSp)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -73,7 +123,7 @@ namespace QA_TMDT.Repository.Impl
                 .ThenInclude(c => c.MaMauSacNavigation)
                 .FirstOrDefaultAsync(sp => sp.MaSp == masp);
         }
-        public async Task<(List<SanPham>? data, int totalItem)> GetByMaDM(int maDM, int page, int pageSize)
+        public async Task<(List<SanPham>? data, int totalItem)> GetByMaDM(int maDM, int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
         {
             var dmDad = await _context.DanhMucs
                 .AsNoTracking()
@@ -81,7 +131,15 @@ namespace QA_TMDT.Repository.Impl
                 .Select(d => d.MaDanhMuc)
                 .ToListAsync();
 
-            var query = _context.SanPhams.Include(img => img.AnhSps).Include(dm => dm.MaDanhMucNavigation).Include(ctsp => ctsp.ChiTietSps).Include(km => km.ChiTietKms).ThenInclude(m => m.MaKhuyenMaiNavigation).Where(dm => dmDad.Contains((int)dm.MaDanhMuc!)).AsNoTracking();
+            var query = ApplyVariantFilter(
+                ApplyPriceFilter(
+                    BuildBaseQuery().Where(dm => dmDad.Contains((int)dm.MaDanhMuc!)),
+                    minPrice,
+                    maxPrice
+                ),
+                maKichThuoc,
+                maMauSac
+            );
 
             var ToTalItems = await query.CountAsync();
 
@@ -92,7 +150,7 @@ namespace QA_TMDT.Repository.Impl
                 .ToListAsync();
             return (Items, ToTalItems);
         }
-        public async Task<(List<SanPham>? data, int totalItem)> GetByTenSP(string tenSP, int page, int pageSize)
+        public async Task<(List<SanPham>? data, int totalItem)> GetByTenSP(string tenSP, int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
         {
             string keySearch = RemoveVNI.ConvertToUnsign(tenSP).ToLower();
 
@@ -101,22 +159,25 @@ namespace QA_TMDT.Repository.Impl
                 return (new List<SanPham>(), 0);
             }
 
-            var query = _context.SanPhams
-                .Include(img => img.AnhSps)
-                .Include(km => km.ChiTietKms).ThenInclude(m => m.MaKhuyenMaiNavigation)
-                .Include(dm => dm.MaDanhMucNavigation)
-                .Include(ctsp => ctsp.ChiTietSps)
-                .Where(sp =>
-                    sp.TenTimKiem != null &&
-                    (sp.TenTimKiem == keySearch ||
-                    sp.TenTimKiem.StartsWith($"{keySearch} ") ||
-                    sp.TenTimKiem.EndsWith($" {keySearch}") ||
-                    sp.TenTimKiem.Contains($" {keySearch} ")))
-                .AsNoTracking();
+            var query = ApplyVariantFilter(
+                ApplyPriceFilter(
+                    BuildBaseQuery()
+                    .Where(sp =>
+                        sp.TenTimKiem != null &&
+                        (sp.TenTimKiem == keySearch ||
+                        sp.TenTimKiem.StartsWith($"{keySearch} ") ||
+                        sp.TenTimKiem.EndsWith($" {keySearch}") ||
+                        sp.TenTimKiem.Contains($" {keySearch} "))),
+                    minPrice,
+                    maxPrice
+                ),
+                maKichThuoc,
+                maMauSac
+            );
 
             var ToTalItems = await query.CountAsync();
 
-            var Items = await query.AsNoTracking()
+            var Items = await query
                 .OrderByDescending(sp => sp.TenSp)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)

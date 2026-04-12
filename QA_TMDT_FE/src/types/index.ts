@@ -95,6 +95,7 @@ export interface ProductSummary {
   moTa?: string | null;
   chatLieu?: string | null;
   anhDaiDien?: string | null;
+  soBienThe?: number;
   duongDanAnhSPs?: string[];
   dsBienThe?: VariantItem[];
 }

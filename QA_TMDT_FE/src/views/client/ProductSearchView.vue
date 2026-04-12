@@ -46,11 +46,17 @@
           <div class="sticky top-24 space-y-4">
             <CatalogFilterPanel
               :categories="rootCategories"
+              :colors="colors"
+              :sizes="sizes"
               :active-category-id="activeCategoryId"
               :active-price-key="priceKey"
+              :active-color-id="activeColorId"
+              :active-size-id="activeSizeId"
               :get-children="getChildren"
               @select-category="selectCategory"
               @toggle-price="togglePrice"
+              @toggle-color="toggleColor"
+              @toggle-size="toggleSize"
             />
           </div>
         </aside>
@@ -74,6 +80,12 @@
               </span>
               <span v-if="activeSearchQuery" class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
                 "{{ activeSearchQuery }}"
+              </span>
+              <span v-if="activeColorName" class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                Mau: {{ activeColorName }}
+              </span>
+              <span v-if="activeSizeName" class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                Size: {{ activeSizeName }}
               </span>
             </div>
 
@@ -227,11 +239,17 @@
             </div>
             <CatalogFilterPanel
               :categories="rootCategories"
+              :colors="colors"
+              :sizes="sizes"
               :active-category-id="activeCategoryId"
               :active-price-key="priceKey"
+              :active-color-id="activeColorId"
+              :active-size-id="activeSizeId"
               :get-children="getChildren"
               @select-category="selectCategoryAndClose"
               @toggle-price="togglePriceAndClose"
+              @toggle-color="toggleColorAndClose"
+              @toggle-size="toggleSizeAndClose"
             />
           </div>
         </div>
@@ -254,6 +272,7 @@ import {
 } from "lucide-vue-next";
 import CatalogFilterPanel from "../../components/client/CatalogFilterPanel.vue";
 import { danhMucService } from "../../services/danhmuc.service";
+import { mauSizeService } from "../../services/mausize.service";
 import {
   extractErrorMessage,
   getPageItems,
@@ -261,7 +280,7 @@ import {
   getTotalPages,
 } from "../../services/service-helpers";
 import { sanPhamService } from "../../services/sanpham.service";
-import type { CategoryItem, ProductSummary } from "../../types";
+import type { CategoryItem, ColorItem, ProductSummary, SizeItem } from "../../types";
 
 const route = useRoute();
 const router = useRouter();
@@ -272,7 +291,9 @@ const FETCH_BATCH_SIZE = 20;
 const placeholderImage = "https://via.placeholder.com/400x533?text=No+Image";
 
 const categories = ref<CategoryItem[]>([]);
+const colors = ref<ColorItem[]>([]);
 const products = ref<ProductSummary[]>([]);
+const sizes = ref<SizeItem[]>([]);
 const totalItems = ref(0);
 const serverTotalPages = ref(1);
 const loading = ref(true);
@@ -297,9 +318,7 @@ const priceKey = computed(() =>
   typeof route.query.price === "string" ? route.query.price : "",
 );
 
-const useClientAggregation = computed(() =>
-  Boolean(priceKey.value) || sortValue.value !== "default",
-);
+const useClientAggregation = computed(() => sortValue.value !== "default");
 
 const currentPage = computed(() => {
   const rawValue = Number(route.query.page || 1);
@@ -312,10 +331,62 @@ const rootCategories = computed(() =>
 );
 
 const activeCategoryId = computed(() => currentCategoryParam.value);
+const activeColorId = computed(() => {
+  const rawValue = Number(route.query.mau);
+  if (!Number.isFinite(rawValue) || rawValue < 1) return null;
+  return Math.floor(rawValue);
+});
+const activeSizeId = computed(() => {
+  const rawValue = Number(route.query.size);
+  if (!Number.isFinite(rawValue) || rawValue < 1) return null;
+  return Math.floor(rawValue);
+});
 
 const activeCategoryName = computed(() => {
   if (!activeCategoryId.value) return "";
   return categories.value.find((category) => category.maDanhMuc === activeCategoryId.value)?.tenDanhMuc || "";
+});
+const activeColorName = computed(() => {
+  if (!activeColorId.value) return "";
+  return colors.value.find((color) => color.maMau === activeColorId.value)?.tenMau || "";
+});
+const activeSizeName = computed(() => {
+  if (!activeSizeId.value) return "";
+  return sizes.value.find((size) => size.maSize === activeSizeId.value)?.tenSize || "";
+});
+
+const currentPriceParams = computed(() => {
+  if (priceKey.value === "under-200") {
+    return { maxPrice: 200000 };
+  }
+
+  if (priceKey.value === "200-500") {
+    return { minPrice: 200000, maxPrice: 500000 };
+  }
+
+  if (priceKey.value === "500-1000") {
+    return { minPrice: 500000, maxPrice: 1000000 };
+  }
+
+  if (priceKey.value === "over-1000") {
+    return { minPrice: 1000000 };
+  }
+
+  return {};
+});
+
+const currentVariantParams = computed(() => {
+  const filters: { maKichThuoc?: number; maMauSac?: number } = {};
+
+  if (activeSizeId.value) {
+    filters.maKichThuoc = activeSizeId.value;
+  }
+
+  if (activeColorId.value) {
+    filters.maMauSac = activeColorId.value;
+  }
+
+  return filters;
 });
 
 const pageTitle = computed(() => {
@@ -330,18 +401,6 @@ const pageTitle = computed(() => {
 
 const processedProducts = computed(() => {
   let items = [...products.value];
-  const key = priceKey.value;
-
-  if (key) {
-    items = items.filter((product) => {
-      const price = product.giaKm || product.giaGoc;
-      if (key === "under-200") return price < 200000;
-      if (key === "200-500") return price >= 200000 && price < 500000;
-      if (key === "500-1000") return price >= 500000 && price < 1000000;
-      if (key === "over-1000") return price >= 1000000;
-      return true;
-    });
-  }
 
   if (sortValue.value === "price-asc") {
     items.sort((a, b) => (a.giaKm || a.giaGoc) - (b.giaKm || b.giaGoc));
@@ -406,16 +465,36 @@ async function loadCategories() {
   categories.value = response.data ?? [];
 }
 
+async function loadVariantFilters() {
+  try {
+    const [sizeResponse, colorResponse] = await Promise.all([
+      mauSizeService.getAllSize(),
+      mauSizeService.getAllMau(),
+    ]);
+
+    sizes.value = sizeResponse.data ?? [];
+    colors.value = colorResponse.data ?? [];
+  } catch {
+    sizes.value = [];
+    colors.value = [];
+  }
+}
+
 async function fetchProductPage(page: number, pageSize: number) {
+  const filters = {
+    ...currentPriceParams.value,
+    ...currentVariantParams.value,
+  };
+
   if (activeSearchQuery.value) {
-    return sanPhamService.searchByName(activeSearchQuery.value, page, pageSize);
+    return sanPhamService.searchByName(activeSearchQuery.value, page, pageSize, filters);
   }
 
   if (activeCategoryId.value) {
-    return sanPhamService.getByCategory(activeCategoryId.value, page, pageSize);
+    return sanPhamService.getByCategory(activeCategoryId.value, page, pageSize, filters);
   }
 
-  return sanPhamService.getAll(page, pageSize);
+  return sanPhamService.getAll(page, pageSize, filters);
 }
 
 async function loadAllMatchingProducts() {
@@ -472,18 +551,30 @@ function pushRoute(next: {
   page?: number;
   sort?: string;
   price?: string;
+  mau?: number | null;
+  size?: number | null;
 }) {
-  const maDM = next.maDM ?? currentCategoryParam.value;
+  const maDM = Object.prototype.hasOwnProperty.call(next, "maDM")
+    ? next.maDM ?? null
+    : currentCategoryParam.value;
   const q = next.q ?? activeSearchQuery.value;
   const page = next.page ?? 1;
   const sort = next.sort ?? sortValue.value;
   const price = next.price ?? priceKey.value;
+  const mau = Object.prototype.hasOwnProperty.call(next, "mau")
+    ? next.mau ?? null
+    : activeColorId.value;
+  const size = Object.prototype.hasOwnProperty.call(next, "size")
+    ? next.size ?? null
+    : activeSizeId.value;
 
   const query: Record<string, string> = {};
   if (q) query.q = q;
   if (page > 1) query.page = String(page);
   if (sort && sort !== "default") query.sort = sort;
   if (price) query.price = price;
+  if (mau) query.mau = String(mau);
+  if (size) query.size = String(size);
 
   if (maDM) {
     void router.push({
@@ -533,6 +624,30 @@ function togglePriceAndClose(nextPriceKey: string) {
   togglePrice(nextPriceKey);
 }
 
+function toggleColor(nextColorId: number | null) {
+  pushRoute({
+    page: 1,
+    mau: nextColorId,
+  });
+}
+
+function toggleColorAndClose(nextColorId: number | null) {
+  filterOpen.value = false;
+  toggleColor(nextColorId);
+}
+
+function toggleSize(nextSizeId: number | null) {
+  pushRoute({
+    page: 1,
+    size: nextSizeId,
+  });
+}
+
+function toggleSizeAndClose(nextSizeId: number | null) {
+  filterOpen.value = false;
+  toggleSize(nextSizeId);
+}
+
 function changeSort() {
   pushRoute({
     page: 1,
@@ -577,7 +692,7 @@ onMounted(async () => {
     ? routeSort
     : "default";
 
-  await Promise.all([loadCategories(), loadProducts()]);
+  await Promise.all([loadCategories(), loadVariantFilters(), loadProducts()]);
 });
 </script>
 

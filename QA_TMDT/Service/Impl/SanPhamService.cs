@@ -17,9 +17,9 @@ namespace QA_TMDT.Service.Impl
             _repo = repo;
             _cloudinary = cloudinary;
         }
-        public async Task<PageResult<SanPhamResponse>> GetAllSP(int page, int pageSize)
+        public async Task<PageResult<SanPhamResponse>> GetAllSP(int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
         {
-            var (Items, TotalItem) = await _repo.GetAllSP(page, pageSize);
+            var (Items, TotalItem) = await _repo.GetAllSP(page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
 
             var product = Items.Select(SanPhamBuilder.ToResponse).ToList();
             return new PageResult<SanPhamResponse>
@@ -149,9 +149,9 @@ namespace QA_TMDT.Service.Impl
             var sp = await _repo.GetFullInFoByMaSP(masp);
             return SanPhamBuilder.ToResponse(sp!);
         }
-        public async Task<PageResult<SanPhamResponse>> GetByMaDM(int maDM, int page, int pageSize)
+        public async Task<PageResult<SanPhamResponse>> GetByMaDM(int maDM, int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
         {
-            var (Items, TotalItem) = await _repo.GetByMaDM(maDM, page, pageSize);
+            var (Items, TotalItem) = await _repo.GetByMaDM(maDM, page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
 
             var product = Items.Select(SanPhamBuilder.ToResponse).ToList();
             return new PageResult<SanPhamResponse>
@@ -162,9 +162,9 @@ namespace QA_TMDT.Service.Impl
                 pageSize = pageSize
             };
         }
-        public async Task<PageResult<SanPhamResponse>> GetByTenSP(string tenSP, int page, int pageSize)
+        public async Task<PageResult<SanPhamResponse>> GetByTenSP(string tenSP, int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
         {
-            var (Items, TotalItem) = await _repo.GetByTenSP(tenSP, page, pageSize);
+            var (Items, TotalItem) = await _repo.GetByTenSP(tenSP, page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
             var product = Items.Select(SanPhamBuilder.ToResponse).ToList();
             return new PageResult<SanPhamResponse>
             {

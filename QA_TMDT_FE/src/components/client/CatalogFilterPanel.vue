@@ -47,22 +47,71 @@
         </button>
       </div>
     </section>
+    <section class="rounded-3xl border border-[var(--ui-border)] bg-white p-4 shadow-[var(--shadow-soft)]">
+      <h3 class="mb-3 text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">Mau sac</h3>
+      <div class="space-y-2">
+        <button
+          type="button"
+          :class="buttonClass(!activeColorId)"
+          @click="$emit('toggle-color', null)"
+        >
+          Tat ca mau
+        </button>
+        <button
+          v-for="color in colors"
+          :key="color.maMau"
+          type="button"
+          :class="buttonClass(activeColorId === color.maMau)"
+          @click="$emit('toggle-color', activeColorId === color.maMau ? null : color.maMau)"
+        >
+          {{ color.tenMau }}
+        </button>
+      </div>
+    </section>
+
+    <section class="rounded-3xl border border-[var(--ui-border)] bg-white p-4 shadow-[var(--shadow-soft)]">
+      <h3 class="mb-3 text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">Kich thuoc</h3>
+      <div class="space-y-2">
+        <button
+          type="button"
+          :class="buttonClass(!activeSizeId)"
+          @click="$emit('toggle-size', null)"
+        >
+          Tat ca size
+        </button>
+        <button
+          v-for="size in sizes"
+          :key="size.maSize"
+          type="button"
+          :class="buttonClass(activeSizeId === size.maSize)"
+          @click="$emit('toggle-size', activeSizeId === size.maSize ? null : size.maSize)"
+        >
+          {{ size.tenSize }}
+        </button>
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { CategoryItem } from "../../types";
+import type { CategoryItem, ColorItem, SizeItem } from "../../types";
 
 defineProps<{
   categories: CategoryItem[];
+  colors: ColorItem[];
+  sizes: SizeItem[];
   activeCategoryId: number | null;
   activePriceKey: string;
+  activeColorId: number | null;
+  activeSizeId: number | null;
   getChildren: (parentId: number) => CategoryItem[];
 }>();
 
 defineEmits<{
   (event: "select-category", value: number | null): void;
   (event: "toggle-price", value: string): void;
+  (event: "toggle-color", value: number | null): void;
+  (event: "toggle-size", value: number | null): void;
 }>();
 
 const priceRanges = [

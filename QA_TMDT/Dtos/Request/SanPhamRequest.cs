@@ -29,7 +29,6 @@ namespace QA_TMDT.Dtos.Request
         public List<IFormFile>? AnhSps { get; set; }
 
         [ModelBinder(BinderType = typeof(JsonModelBinder))]
-        [MinLength(1, ErrorMessage = "Phải có ít nhất một biến thể sản phẩm")]
         public List<ChiTietSanPhamRequest> DsBienThe { get; set; } = new List<ChiTietSanPhamRequest>();
     }
 }

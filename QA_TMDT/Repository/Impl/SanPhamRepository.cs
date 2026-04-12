@@ -96,7 +96,23 @@ namespace QA_TMDT.Repository.Impl
         {
             string keySearch = RemoveVNI.ConvertToUnsign(tenSP).ToLower();
 
-            var query = _context.SanPhams.Include(img => img.AnhSps).Include(km => km.ChiTietKms).ThenInclude(m => m.MaKhuyenMaiNavigation).Include(dm => dm.MaDanhMucNavigation).Include(ctsp => ctsp.ChiTietSps).Where(sp => sp.TenTimKiem!.Contains(keySearch)).AsNoTracking();
+            if (string.IsNullOrWhiteSpace(keySearch))
+            {
+                return (new List<SanPham>(), 0);
+            }
+
+            var query = _context.SanPhams
+                .Include(img => img.AnhSps)
+                .Include(km => km.ChiTietKms).ThenInclude(m => m.MaKhuyenMaiNavigation)
+                .Include(dm => dm.MaDanhMucNavigation)
+                .Include(ctsp => ctsp.ChiTietSps)
+                .Where(sp =>
+                    sp.TenTimKiem != null &&
+                    (sp.TenTimKiem == keySearch ||
+                    sp.TenTimKiem.StartsWith($"{keySearch} ") ||
+                    sp.TenTimKiem.EndsWith($" {keySearch}") ||
+                    sp.TenTimKiem.Contains($" {keySearch} ")))
+                .AsNoTracking();
 
             var ToTalItems = await query.CountAsync();
 

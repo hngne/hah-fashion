@@ -26,10 +26,9 @@ namespace QA_TMDT.Helper
             // 2. Gộp lại thành chuỗi không dấu (lúc này vẫn còn Đ/đ)
             string str = sb.ToString().Normalize(System.Text.NormalizationForm.FormC);
 
-            // 3. Xử lý thủ công Đ/đ
-            // Lưu ý: Replace 'đ' trước, 'Đ' sau hoặc ngược lại đều được
-            // Cách 1: Thay thế trực tiếp char
-            return str.Replace('đ', 'd').Replace('Đ', 'D').ToLower();
+            // 3. Xử lý thủ công Đ/đ và chuẩn hóa khoảng trắng để tìm kiếm ổn định hơn
+            str = str.Replace('đ', 'd').Replace('Đ', 'D').ToLower();
+            return Regex.Replace(str, @"\s+", " ").Trim();
         }
     }
 }

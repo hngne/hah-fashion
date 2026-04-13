@@ -184,7 +184,8 @@ export interface ServerCartItem {
   tenSize: string;
   tenMau: string;
   soLuongTon: number;
-  maChiTietSP: string;
+  maChiTietSp?: string;
+  maChiTietSP?: string;
   soLuong: number;
   giaGoc: number;
   giaDatHang: number;

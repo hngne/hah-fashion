@@ -24,7 +24,8 @@ export interface ServerCartItem {
   tenSize: string;
   tenMau: string;
   soLuongTon: number;
-  maChiTietSP: string;
+  maChiTietSp?: string;
+  maChiTietSP?: string;
   soLuong: number;
   giaGoc: number;
   giaDatHang: number;
@@ -67,7 +68,7 @@ export const useCartStore = defineStore("cart", () => {
   const items = computed(() => {
     if (isLoggedIn.value) {
       return serverItems.value.map((item) => ({
-        maCTSP: item.maChiTietSP,
+        maCTSP: item.maChiTietSp || item.maChiTietSP || "",
         maSP: item.maSP,
         tenSP: item.tenSP,
         anh: item.anh,

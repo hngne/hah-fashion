@@ -62,7 +62,7 @@ namespace QA_TMDT.Service.Impl
             }
             if(soluongTon < soLuongDaCo + soLuongMua)
             {
-                return (false, $"Kho chỉ còn {soluongTon}, bạn đã có {soLuongDaCo} trong giỏ.", null);
+                return (false, "Vượt quá số lượng trong kho hàng còn lại", null);
             }
             var result = await _repo.AddOrUpdateGioHang(matk, mactsp, soLuongMua);
             if (!result)
@@ -127,7 +127,7 @@ namespace QA_TMDT.Service.Impl
             }
             else if (soluongTon < soLuongMoi)
             {
-                return (false, $"Kho chỉ còn {soluongTon} sản phẩm", null);
+                return (false, "Vượt quá số lượng trong kho hàng còn lại", null);
             }
             var result = await _repo.UpdateItemGioHang(matk, mactsp, soLuongMoi);
             if (!result)

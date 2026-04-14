@@ -59,7 +59,13 @@ namespace QA_TMDT.Controllers
         [HttpPost]
         public async Task<IActionResult> createdonhangasync(DatHangRequest request)
         {
-            request.MaTaiKhoan = GetUserID();
+            var maTaiKhoan = GetUserID();
+            if (string.IsNullOrWhiteSpace(maTaiKhoan))
+            {
+                return Unauthorized(APIResponse<DonHangResponse>.Fail("Không xác định được tài khoản từ token đăng nhập"));
+            }
+
+            request.MaTaiKhoan = maTaiKhoan;
             var result = await _service.CreateDonHang(request);
             if (!result.success)
             {

@@ -3,7 +3,7 @@
     public class DatHangRequest
     {
         [StringLength(50, ErrorMessage = "Mã tài khoản không được vượt quá 50 ký tự")]
-        public string MaTaiKhoan { get; set; } = null!;
+        public string? MaTaiKhoan { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Phương thức thanh toán phải lớn hơn 0")]
         public int MaPTTT { get; set; }

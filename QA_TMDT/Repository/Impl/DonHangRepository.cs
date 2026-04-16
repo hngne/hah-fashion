@@ -13,10 +13,26 @@ namespace QA_TMDT.Repository.Impl
             _context = context;
         }
 
-        public async Task<List<DonHang>> GetAll()
+        public async Task<List<DonHang>> GetAll(string? maDonHang = null, string? trangThai = null)
         {
-            return await _context.DonHangs
+            var query = _context.DonHangs
                 .AsNoTracking()
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(maDonHang))
+            {
+                var normalizedMaDonHang = maDonHang.Trim().ToLower();
+                query = query.Where(dh => dh.MaDonHang.ToLower().Contains(normalizedMaDonHang));
+            }
+
+            if (!string.IsNullOrWhiteSpace(trangThai))
+            {
+                var normalizedTrangThai = trangThai.Trim().ToLower();
+                query = query.Where(dh => dh.TrangThaiDonHang != null && dh.TrangThaiDonHang.ToLower() == normalizedTrangThai);
+            }
+
+            return await query
+                .OrderByDescending(dh => dh.NgayDatHang)
                 .ToListAsync();
         }
 
@@ -62,6 +78,7 @@ namespace QA_TMDT.Repository.Impl
                 .Include(ptvc => ptvc.MaPtvcNavigation)
                 .Include(pttt => pttt.MaPtttNavigation)
                 .Include(v => v.MaVoucherNavigation)
+                .Where(d => d.MaTaiKhoan == matk)
                 .OrderByDescending(d => d.NgayDatHang)
                 .ToListAsync();
         }
@@ -135,3 +152,4 @@ namespace QA_TMDT.Repository.Impl
         }
     }
 }
+

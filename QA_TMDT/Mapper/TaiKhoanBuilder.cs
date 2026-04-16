@@ -16,6 +16,7 @@ namespace QA_TMDT.Mapper
                 SoDienThoai = tk.SoDienThoai,
                 VaiTro = tk.VaiTro,
                 DiaChi = tk.DiaChi,
+                TrangThai = true,
             };
         }
     }

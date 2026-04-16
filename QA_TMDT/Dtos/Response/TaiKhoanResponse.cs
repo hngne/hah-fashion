@@ -13,5 +13,7 @@
         public string? VaiTro { get; set; }
 
         public string? DiaChi { get; set; }
+
+        public bool TrangThai { get; set; }
     }
 }

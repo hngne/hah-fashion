@@ -25,9 +25,9 @@ namespace QA_TMDT.Service.Impl
             _chiTietSPRepo = chiTietSPRepo;
         }
 
-        public async Task<IEnumerable<DonHangResponse>> GetAll()
+        public async Task<IEnumerable<DonHangResponse>> GetAll(string? maDonHang = null, string? trangThai = null)
         {
-            var result = await _repo.GetAll();
+            var result = await _repo.GetAll(maDonHang, trangThai);
             return result.Select(DonHangBuilder.ToResponse);
         }
         public async Task<(bool, string, DonHangResponse?)> CreateDonHang(DatHangRequest request)

@@ -8,7 +8,7 @@ namespace QA_TMDT.Service
 {
     public interface ISanPhamService
     {
-        Task<PageResult<SanPhamResponse>> GetAllSP(int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null);
+        Task<PageResult<SanPhamResponse>> GetAllSP(int page, int pageSize, string? key = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null);
         Task<(bool success, string message, SanPhamResponse? response)> CreateSP(SanPhamRequest request);
         Task<(bool success, string message, ChiTietSanPhamResponse? response)> CreateVariant(AddBienTheRequest request);
         Task<SanPhamResponse?> GetFullInFoByMaSP(string masp);

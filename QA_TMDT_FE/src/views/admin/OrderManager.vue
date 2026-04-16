@@ -74,7 +74,7 @@
           </thead>
           <tbody class="divide-y divide-gray-50">
             <tr
-              v-for="dh in filteredList"
+              v-for="dh in list"
               :key="dh.maDonHang"
               class="hover:bg-gray-50/50 transition-colors cursor-pointer"
               @click="viewDetail(dh.maDonHang)"
@@ -118,7 +118,7 @@
                 </button>
               </td>
             </tr>
-            <tr v-if="filteredList.length === 0">
+            <tr v-if="list.length === 0">
               <td
                 colspan="6"
                 class="px-5 py-10 text-center text-gray-400 text-sm"
@@ -133,7 +133,7 @@
       <!-- Mobile -->
       <div class="lg:hidden divide-y divide-gray-50">
         <div
-          v-for="dh in filteredList"
+          v-for="dh in list"
           :key="dh.maDonHang"
           class="p-4 space-y-2 cursor-pointer"
           @click="viewDetail(dh.maDonHang)"
@@ -156,7 +156,7 @@
           </div>
         </div>
         <div
-          v-if="filteredList.length === 0"
+          v-if="list.length === 0"
           class="p-8 text-center text-gray-400 text-sm"
         >
           Không có đơn hàng.
@@ -437,7 +437,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, onBeforeUnmount, onMounted, watch } from "vue";
 import {
   Search as SearchIcon,
   Eye as EyeIcon,
@@ -455,6 +455,7 @@ const list = ref<any[]>([]);
 const loading = ref(true);
 const searchQuery = ref("");
 const filterStatus = ref("all");
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // Detail
 const showDetail = ref(false);
@@ -498,17 +499,6 @@ const nextStatuses = (s: string): string[] => {
   return [];
 };
 
-const filteredList = computed(() => {
-  let result = list.value;
-  if (filterStatus.value !== "all")
-    result = result.filter((d) => d.trangThaiDonHang === filterStatus.value);
-  if (searchQuery.value.trim()) {
-    const q = searchQuery.value.trim().toLowerCase();
-    result = result.filter((d) => d.maDonHang.toLowerCase().includes(q));
-  }
-  return result;
-});
-
 const formatMoney = (val: number) =>
   val ? val.toLocaleString("vi-VN") + " ₫" : "0 ₫";
 const formatDate = (d: string) =>
@@ -525,7 +515,11 @@ const formatDate = (d: string) =>
 const fetchOrders = async () => {
   loading.value = true;
   try {
-    const res: any = await donHangService.getAll();
+    const res: any = await donHangService.getAll({
+      maDonHang: searchQuery.value.trim() || undefined,
+      trangThai:
+        filterStatus.value !== "all" ? filterStatus.value : undefined,
+    });
     if (res.success) list.value = res.data || [];
   } catch {
     error("Lỗi tải danh sách đơn hàng");
@@ -573,6 +567,19 @@ const changeStatus = async (maDH: string, newStatus: string) => {
     changingStatus.value = false;
   }
 };
+
+watch(
+  [searchQuery, filterStatus],
+  () => {
+    if (searchTimeout) clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(fetchOrders, 350);
+  },
+  { flush: "post" },
+);
+
+onBeforeUnmount(() => {
+  if (searchTimeout) clearTimeout(searchTimeout);
+});
 
 onMounted(fetchOrders);
 </script>

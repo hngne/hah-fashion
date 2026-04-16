@@ -7,10 +7,10 @@ namespace QA_TMDT.Repository
         Task<TaiKhoan?> GetTKByTenDangNhap(string tenDangNhap);
         Task<bool> AddAsync(TaiKhoan taiKhoan);
         Task SaveChangeAsync();
-        Task<List<TaiKhoan>> GetAllTK();
+        Task<List<TaiKhoan>> GetAllTK(string? keyword = null, string? vaiTro = null, bool? trangThai = null);
         Task<TaiKhoan?> GetTKByMaTK(string maTK);
         Task<bool> UpdateTK(TaiKhoan tk);
-        Task<bool> DeleteOrLock(string maTK);
+        Task<bool> UpdateTrangThai(string maTK, bool trangThai);
         Task<bool> CheckTKExist(string maTK);
     }
 }

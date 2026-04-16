@@ -21,9 +21,9 @@ namespace QA_TMDT.Controllers
         [HttpGet]
         [Authorize(Roles = "admin")]
         [Route("admin-getall-acc")]
-        public async Task<IActionResult> getalltk()
+        public async Task<IActionResult> getalltk([FromQuery] string? keyword, [FromQuery] string? vaiTro, [FromQuery] bool? trangThai)
         {
-            var result = await _service.GetAllTK();
+            var result = await _service.GetAllTK(keyword, vaiTro, trangThai);
             return Ok(APIResponse<IEnumerable<TaiKhoanResponse>>.OK("Lấy danh sách tài khoản thành công", result));
         }
         [HttpGet]
@@ -69,11 +69,11 @@ namespace QA_TMDT.Controllers
             return Ok(APIResponse<TaiKhoanResponse>.OK(result.message, result.response!));
         }
 
-        [HttpDelete("admin/{maTK}")]
+        [HttpPut("admin/status/{maTK}")]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> Delete(string maTK)
+        public async Task<IActionResult> UpdateTrangThai(string maTK, [FromQuery] bool trangThai)
         {
-            var result = await _service.DeleteOrLockTK(maTK);
+            var result = await _service.UpdateTrangThaiTK(maTK, trangThai);
             if (!result.success)
                 return BadRequest(APIResponse<string>.Fail(result.meesage));
 

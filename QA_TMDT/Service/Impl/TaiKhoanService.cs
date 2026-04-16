@@ -106,12 +106,13 @@ namespace QA_TMDT.Service.Impl
                 SoDienThoai = exist.SoDienThoai,
                 VaiTro = exist.VaiTro,
                 DiaChi = exist.DiaChi,
+                TrangThai = true,
                 Token = Token
             });
         }
-        public async Task<IEnumerable<TaiKhoanResponse>> GetAllTK()
+        public async Task<IEnumerable<TaiKhoanResponse>> GetAllTK(string? keyword = null, string? vaiTro = null, bool? trangThai = null)
         {
-            var result = await _repo.GetAllTK();
+            var result = await _repo.GetAllTK(keyword, vaiTro, null);
             return result.Select(TaiKhoanBuilder.ToResponse);
         }
         public async Task<TaiKhoanResponse?> GetTKByMaTK(string maTK)
@@ -169,31 +170,11 @@ namespace QA_TMDT.Service.Impl
         }
         public async Task<(bool, string, TaiKhoanResponse?)> UpdateRole(string maTK, string newRole)
         {
-            var check = await _repo.CheckTKExist(maTK);
-            if (!check)
-            {
-                return (false, "Tài khoản không tồn tại", null);
-            }
-            if (newRole.ToLower() != "admin" && newRole.ToLower() != "user")
-                return (false, "Role không hợp lệ (chỉ chấp nhận 'admin' hoặc 'user')", null);
-            var exist = await _repo.GetTKByMaTK(maTK);
-            exist.VaiTro = newRole;
-
-            var success = await _repo.UpdateTK(exist);
-            if (!success)
-            {
-                return (false, "Có lỗi khi cập nhật tài khoản", null);
-            }
-            return (true, "Cập nhật thông tin thành công", TaiKhoanBuilder.ToResponse(exist));
+            return (false, "Chức năng đổi quyền đã bị tắt", null);
         }
-        public async Task<(bool, string)> DeleteOrLockTK(string maTK)
+        public async Task<(bool, string)> UpdateTrangThaiTK(string maTK, bool trangThai)
         {
-            var result = await _repo.DeleteOrLock(maTK);
-            if (!result)
-            {
-                return (false, "Tài khoản có thể không tồn tại hoặc đã có đơn hàng");
-            }
-            return (true, "Xóa tài khoản thành công");
+            return (false, "Chua co cot trangThai trong DB, khong the khoa user");
         }
     }
 }

@@ -17,14 +17,13 @@ namespace QA_TMDT.Service.Impl
             _repo = repo;
             _cloudinary = cloudinary;
         }
-        public async Task<PageResult<SanPhamResponse>> GetAllSP(int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
+        public async Task<PageResult<SanPhamResponse>> GetAllSP(int page, int pageSize, string? key = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
         {
-            var (Items, TotalItem) = await _repo.GetAllSP(page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
+            var (Items, TotalItem) = await _repo.GetAllSP(page, pageSize, key, minPrice, maxPrice, maKichThuoc, maMauSac);
 
-            var product = Items.Select(SanPhamBuilder.ToResponse).ToList();
             return new PageResult<SanPhamResponse>
             {
-                item = product,
+                item = Items,
                 totalItem = TotalItem,
                 page = page,
                 pageSize = pageSize
@@ -153,10 +152,9 @@ namespace QA_TMDT.Service.Impl
         {
             var (Items, TotalItem) = await _repo.GetByMaDM(maDM, page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
 
-            var product = Items.Select(SanPhamBuilder.ToResponse).ToList();
             return new PageResult<SanPhamResponse>
             {
-                item = product,
+                item = Items,
                 totalItem = TotalItem,
                 page = page,
                 pageSize = pageSize
@@ -165,10 +163,9 @@ namespace QA_TMDT.Service.Impl
         public async Task<PageResult<SanPhamResponse>> GetByTenSP(string tenSP, int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
         {
             var (Items, TotalItem) = await _repo.GetByTenSP(tenSP, page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
-            var product = Items.Select(SanPhamBuilder.ToResponse).ToList();
             return new PageResult<SanPhamResponse>
             {
-                item = product,
+                item = Items,
                 totalItem = TotalItem,
                 page = page,
                 pageSize = pageSize
@@ -265,3 +262,7 @@ namespace QA_TMDT.Service.Impl
         }
     }
 }
+
+
+
+

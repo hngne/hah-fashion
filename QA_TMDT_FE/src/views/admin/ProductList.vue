@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <Toast />
     <!-- Header -->
@@ -6,16 +6,16 @@
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6"
     >
       <div>
-        <h3 class="text-xl font-bold text-[#1F2937]">Quản lý Sản phẩm</h3>
+        <h3 class="text-xl font-bold text-[#1F2937]">Quáº£n lÃ½ Sáº£n pháº©m</h3>
         <p class="text-sm text-gray-500 mt-0.5">
-          Danh sách tất cả sản phẩm trong hệ thống.
+          Danh sÃ¡ch táº¥t cáº£ sáº£n pháº©m trong há»‡ thá»‘ng.
         </p>
       </div>
       <router-link
         to="/admin/products/new"
         class="inline-flex items-center px-4 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 shadow-sm transition"
       >
-        <PlusIcon class="h-4 w-4 mr-1.5" stroke-width="2.5" /> Thêm sản phẩm
+        <PlusIcon class="h-4 w-4 mr-1.5" stroke-width="2.5" /> ThÃªm sáº£n pháº©m
       </router-link>
     </div>
 
@@ -34,7 +34,7 @@
                 : 'text-gray-500',
             ]"
           >
-            Tên SP
+            TÃªn SP
           </button>
           <button
             @click="searchType = 'code'"
@@ -45,7 +45,7 @@
                 : 'text-gray-500',
             ]"
           >
-            Mã SP
+            MÃ£ SP
           </button>
         </div>
         <div class="flex-1 relative">
@@ -59,8 +59,8 @@
             type="text"
             :placeholder="
               searchType === 'name'
-                ? 'Tìm theo tên sản phẩm...'
-                : 'Nhập mã sản phẩm (VD: SP001)...'
+                ? 'TÃ¬m theo tÃªn sáº£n pháº©m...'
+                : 'Nháº­p mÃ£ sáº£n pháº©m (VD: SP001)...'
             "
             class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400"
           />
@@ -83,12 +83,12 @@
             <tr
               class="text-left text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100"
             >
-              <th class="px-5 py-3 w-16">Ảnh</th>
-              <th class="px-5 py-3">Tên sản phẩm</th>
-              <th class="px-5 py-3">Danh mục</th>
-              <th class="px-5 py-3">Giá gốc</th>
-              <th class="px-5 py-3 w-24">Biến thể</th>
-              <th class="px-5 py-3 w-40 text-right">Thao tác</th>
+              <th class="px-5 py-3 w-16">áº¢nh</th>
+              <th class="px-5 py-3">TÃªn sáº£n pháº©m</th>
+              <th class="px-5 py-3">Danh má»¥c</th>
+              <th class="px-5 py-3">GiÃ¡ gá»‘c</th>
+              <th class="px-5 py-3 w-24">Biáº¿n thá»ƒ</th>
+              <th class="px-5 py-3 w-40 text-right">Thao tÃ¡c</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-50">
@@ -121,7 +121,7 @@
                 <p class="text-[11px] text-gray-400 mt-0.5">{{ sp.maSp }}</p>
               </td>
               <td class="px-5 py-3 text-sm text-gray-600">
-                {{ sp.tenDanhMuc || "—" }}
+                {{ sp.tenDanhMuc || "â€”" }}
               </td>
               <td class="px-5 py-3 text-sm font-medium text-gray-800">
                 {{ formatMoney(sp.giaGoc) }}
@@ -129,28 +129,28 @@
               <td class="px-5 py-3">
                 <span
                   class="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600"
-                  >{{ sp.dsBienThe?.length || 0 }}</span
+                  >{{ sp.soBienThe ?? sp.dsBienThe?.length ?? 0 }}</span
                 >
               </td>
               <td class="px-5 py-3 text-right" @click.stop>
                 <button
                   @click="viewDetail(sp.maSp)"
                   class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors mr-1"
-                  title="Xem chi tiết"
+                  title="Xem chi tiáº¿t"
                 >
                   <EyeIcon class="h-4 w-4" stroke-width="2" />
                 </button>
                 <router-link
                   :to="`/admin/products/${sp.maSp}/edit`"
                   class="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors inline-block mr-1"
-                  title="Sửa"
+                  title="Sá»­a"
                 >
                   <PencilIcon class="h-4 w-4" stroke-width="2" />
                 </router-link>
                 <button
                   @click="confirmDelete(sp)"
                   class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                  title="Xóa"
+                  title="XÃ³a"
                 >
                   <Trash2Icon class="h-4 w-4" stroke-width="2" />
                 </button>
@@ -161,7 +161,7 @@
                 colspan="6"
                 class="px-5 py-10 text-center text-gray-400 text-sm"
               >
-                Không tìm thấy sản phẩm nào.
+                KhÃ´ng tÃ¬m tháº¥y sáº£n pháº©m nÃ o.
               </td>
             </tr>
           </tbody>
@@ -195,7 +195,7 @@
               {{ sp.tenSp }}
             </p>
             <p class="text-xs text-gray-400 mt-0.5">
-              {{ sp.tenDanhMuc }} · {{ sp.dsBienThe?.length || 0 }} biến thể
+              {{ sp.tenDanhMuc }} Â· {{ sp.soBienThe ?? sp.dsBienThe?.length ?? 0 }} biáº¿n thá»ƒ
             </p>
             <p class="text-sm font-bold text-gray-700 mt-1">
               {{ formatMoney(sp.giaGoc) }}
@@ -220,7 +220,7 @@
           v-if="items.length === 0"
           class="p-8 text-center text-gray-400 text-sm"
         >
-          Không có sản phẩm.
+          KhÃ´ng cÃ³ sáº£n pháº©m.
         </div>
       </div>
 
@@ -230,7 +230,7 @@
         class="px-5 py-3 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-2"
       >
         <span class="text-xs text-gray-400"
-          >Trang {{ page }} / {{ totalPage }} · {{ totalItem }} sản phẩm</span
+          >Trang {{ page }} / {{ totalPage }} Â· {{ totalItem }} sáº£n pháº©m</span
         >
         <div class="flex items-center space-x-1">
           <button
@@ -238,7 +238,7 @@
             :disabled="page <= 1"
             class="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 transition"
           >
-            Trước
+            TrÆ°á»›c
           </button>
           <button
             v-for="p in visiblePages"
@@ -287,7 +287,7 @@
                 class="sticky top-0 bg-white px-6 py-4 border-b border-gray-100 flex items-center justify-between z-10"
               >
                 <h4 class="text-lg font-bold text-gray-800">
-                  Chi tiết sản phẩm
+                  Chi tiáº¿t sáº£n pháº©m
                 </h4>
                 <button
                   @click="showDetail = false"
@@ -298,7 +298,7 @@
               </div>
               <!-- Body -->
               <div class="p-6 space-y-5">
-                <!-- Ảnh -->
+                <!-- áº¢nh -->
                 <div
                   v-if="detailData.duongDanAnhSPs?.length"
                   class="flex gap-2 overflow-x-auto pb-2"
@@ -314,7 +314,7 @@
                 <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                   <div>
                     <span class="text-gray-400 text-xs uppercase font-bold"
-                      >Mã SP</span
+                      >MÃ£ SP</span
                     >
                     <p class="font-semibold text-gray-800 mt-0.5">
                       {{ detailData.maSp }}
@@ -322,15 +322,15 @@
                   </div>
                   <div>
                     <span class="text-gray-400 text-xs uppercase font-bold"
-                      >Danh mục</span
+                      >Danh má»¥c</span
                     >
                     <p class="font-semibold text-gray-800 mt-0.5">
-                      {{ detailData.tenDanhMuc || "—" }}
+                      {{ detailData.tenDanhMuc || "â€”" }}
                     </p>
                   </div>
                   <div>
                     <span class="text-gray-400 text-xs uppercase font-bold"
-                      >Tên SP</span
+                      >TÃªn SP</span
                     >
                     <p class="font-semibold text-gray-800 mt-0.5">
                       {{ detailData.tenSp }}
@@ -338,7 +338,7 @@
                   </div>
                   <div>
                     <span class="text-gray-400 text-xs uppercase font-bold"
-                      >Giá gốc</span
+                      >GiÃ¡ gá»‘c</span
                     >
                     <p class="font-semibold text-gray-800 mt-0.5">
                       {{ formatMoney(detailData.giaGoc) }}
@@ -346,7 +346,7 @@
                   </div>
                   <div>
                     <span class="text-gray-400 text-xs uppercase font-bold"
-                      >Giá KM</span
+                      >GiÃ¡ KM</span
                     >
                     <p class="font-semibold text-emerald-600 mt-0.5">
                       {{ formatMoney(detailData.giaKm) }}
@@ -354,16 +354,16 @@
                   </div>
                   <div>
                     <span class="text-gray-400 text-xs uppercase font-bold"
-                      >Chất liệu</span
+                      >Cháº¥t liá»‡u</span
                     >
                     <p class="font-semibold text-gray-800 mt-0.5">
-                      {{ detailData.chatLieu || "—" }}
+                      {{ detailData.chatLieu || "â€”" }}
                     </p>
                   </div>
                 </div>
                 <div v-if="detailData.moTa">
                   <span class="text-gray-400 text-xs uppercase font-bold"
-                    >Mô tả</span
+                    >MÃ´ táº£</span
                   >
                   <p class="text-sm text-gray-600 mt-1">
                     {{ detailData.moTa }}
@@ -372,7 +372,7 @@
                 <!-- Variants Table -->
                 <div>
                   <h5 class="text-xs font-bold text-gray-400 uppercase mb-2">
-                    Biến thể ({{ detailData.dsBienThe?.length || 0 }})
+                    Biáº¿n thá»ƒ ({{ detailData.dsBienThe?.length || 0 }})
                   </h5>
                   <div
                     class="overflow-x-auto border border-gray-200 rounded-lg"
@@ -382,11 +382,11 @@
                         <tr
                           class="text-[10px] font-bold text-gray-400 uppercase bg-gray-50"
                         >
-                          <th class="px-4 py-2 text-left">Mã CTSP</th>
+                          <th class="px-4 py-2 text-left">MÃ£ CTSP</th>
                           <th class="px-4 py-2 text-left">Size</th>
-                          <th class="px-4 py-2 text-left">Màu</th>
-                          <th class="px-4 py-2 text-right">Tồn kho</th>
-                          <th class="px-4 py-2 text-right">Giá bán</th>
+                          <th class="px-4 py-2 text-left">MÃ u</th>
+                          <th class="px-4 py-2 text-right">Tá»“n kho</th>
+                          <th class="px-4 py-2 text-right">GiÃ¡ bÃ¡n</th>
                         </tr>
                       </thead>
                       <tbody class="divide-y divide-gray-50">
@@ -412,7 +412,7 @@
                             colspan="5"
                             class="px-4 py-4 text-center text-gray-400"
                           >
-                            Không có biến thể.
+                            KhÃ´ng cÃ³ biáº¿n thá»ƒ.
                           </td>
                         </tr>
                       </tbody>
@@ -428,13 +428,13 @@
                   @click="showDetail = false"
                   class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition"
                 >
-                  Đóng
+                  ÄÃ³ng
                 </button>
                 <router-link
                   :to="`/admin/products/${detailData.maSp}/edit`"
                   @click="showDetail = false"
                   class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition"
-                  >Sửa sản phẩm</router-link
+                  >Sá»­a sáº£n pháº©m</router-link
                 >
               </div>
             </template>
@@ -458,9 +458,9 @@
               class="h-10 w-10 text-red-400 mx-auto mb-3"
               stroke-width="1.5"
             />
-            <h4 class="text-lg font-bold text-gray-800 mb-1">Xóa sản phẩm</h4>
+            <h4 class="text-lg font-bold text-gray-800 mb-1">XÃ³a sáº£n pháº©m</h4>
             <p class="text-sm text-gray-500">
-              Bạn có chắc muốn xóa
+              Báº¡n cÃ³ cháº¯c muá»‘n xÃ³a
               <strong class="text-gray-700">{{ deleteTarget?.tenSp }}</strong
               >?
             </p>
@@ -469,14 +469,14 @@
                 @click="showDelete = false"
                 class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition"
               >
-                Hủy
+                Há»§y
               </button>
               <button
                 @click="handleDelete"
                 :disabled="deleting"
                 class="px-5 py-2 text-sm font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg shadow-sm transition disabled:opacity-50"
               >
-                {{ deleting ? "Đang xóa..." : "Xóa" }}
+                {{ deleting ? "Äang xÃ³a..." : "XÃ³a" }}
               </button>
             </div>
           </div>
@@ -531,7 +531,7 @@ const visiblePages = computed(() => {
 });
 
 const formatMoney = (val: number) =>
-  val ? val.toLocaleString("vi-VN") + " ₫" : "0 ₫";
+  val ? val.toLocaleString("vi-VN") + " â‚«" : "0 â‚«";
 
 const fetchProducts = async () => {
   loading.value = true;
@@ -561,7 +561,7 @@ const fetchProducts = async () => {
       }
     }
   } catch (e) {
-    error("Lỗi tải danh sách sản phẩm");
+    error("Lá»—i táº£i danh sÃ¡ch sáº£n pháº©m");
   } finally {
     loading.value = false;
   }
@@ -590,7 +590,7 @@ const viewDetail = async (maSp: string) => {
     if (res.success) detailData.value = res.data;
     else error(res.message);
   } catch (e) {
-    error("Lỗi tải chi tiết sản phẩm");
+    error("Lá»—i táº£i chi tiáº¿t sáº£n pháº©m");
   } finally {
     detailLoading.value = false;
   }
@@ -606,12 +606,12 @@ const handleDelete = async () => {
   try {
     const res: any = await sanPhamService.delete(deleteTarget.value.maSp);
     if (res.success) {
-      success("Xóa sản phẩm thành công");
+      success("XÃ³a sáº£n pháº©m thÃ nh cÃ´ng");
       showDelete.value = false;
       fetchProducts();
     } else error(res.message);
   } catch (e: any) {
-    error(e.response?.data?.message || "Lỗi xóa sản phẩm");
+    error(e.response?.data?.message || "Lá»—i xÃ³a sáº£n pháº©m");
   } finally {
     deleting.value = false;
   }
@@ -632,3 +632,4 @@ onMounted(fetchProducts);
   opacity: 0;
 }
 </style>
+

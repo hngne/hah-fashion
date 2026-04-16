@@ -29,7 +29,19 @@ export interface DangNhapResponse {
   soDienThoai?: string | null;
   vaiTro?: string | null;
   diaChi?: string | null;
+  trangThai?: boolean;
   token: string;
+}
+
+export interface UserAccount {
+  maTaiKhoan: string;
+  tenDangNhap: string;
+  email?: string | null;
+  hoTen?: string | null;
+  soDienThoai?: string | null;
+  vaiTro?: string | null;
+  diaChi?: string | null;
+  trangThai: boolean;
 }
 
 export interface LoginFormValues extends DangNhapRequest {}

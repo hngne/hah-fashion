@@ -1,16 +1,16 @@
-import axios from "axios";
+﻿import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "https://localhost:7196/api",
 
-  timeout: 15000,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
     "ngrok-skip-browser-warning": "true",
   },
 });
 
-// Request Interceptor: Tự động đính kèm Token
+// Request Interceptor: Tá»± Ä‘á»™ng Ä‘Ã­nh kÃ¨m Token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -24,15 +24,15 @@ api.interceptors.request.use(
   },
 );
 
-// Response Interceptor: Xử lý lỗi 401 Unauthorized toàn cục
+// Response Interceptor: Xá»­ lÃ½ lá»—i 401 Unauthorized toÃ n cá»¥c
 api.interceptors.response.use(
   (response) => {
-    // API Của bạn trả về Wrapper { success, message, response }
+    // API Cá»§a báº¡n tráº£ vá» Wrapper { success, message, response }
     return response.data;
   },
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Token hết hạn hoặc không hợp lệ -> Xóa bộ nhớ và điều hướng
+      // Token háº¿t háº¡n hoáº·c khÃ´ng há»£p lá»‡ -> XÃ³a bá»™ nhá»› vÃ  Ä‘iá»u hÆ°á»›ng
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       const currentPath = window.location.pathname;
@@ -50,3 +50,4 @@ api.interceptors.response.use(
 );
 
 export default api;
+

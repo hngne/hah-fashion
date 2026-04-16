@@ -4,7 +4,7 @@ namespace QA_TMDT.Repository
 {
     public interface IDonHangRepository
     {
-        Task<List<DonHang>> GetAll();
+        Task<List<DonHang>> GetAll(string? maDonHang = null, string? trangThai = null);
         Task<DonHang> CreateDonHang(DonHang donHang);
         Task<DonHang?> GetDonHangByMaDH(string maDH);
         Task<List<DonHang>> GetDonHangByMaTK(string matk);

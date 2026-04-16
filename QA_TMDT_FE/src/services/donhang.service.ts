@@ -3,10 +3,16 @@ import type { APIResponse, CheckoutFormValues, Order } from "../types";
 
 export const donHangService = {
   // Admin: get all orders (used by both OrderManager and Dashboard)
-  getAll: async (): Promise<APIResponse<Order[]>> =>
-    api.get("/DonHang/Admin-getAll"),
-  getAllAdmin: async (): Promise<APIResponse<Order[]>> =>
-    api.get("/DonHang/Admin-getAll"),
+  getAll: async (params?: {
+    maDonHang?: string;
+    trangThai?: string;
+  }): Promise<APIResponse<Order[]>> =>
+    api.get("/DonHang/Admin-getAll", { params }),
+  getAllAdmin: async (params?: {
+    maDonHang?: string;
+    trangThai?: string;
+  }): Promise<APIResponse<Order[]>> =>
+    api.get("/DonHang/Admin-getAll", { params }),
   // Get order by ID (detail)
   getById: async (maDH: string): Promise<APIResponse<Order>> =>
     api.get(`/DonHang/get-dh-by/${maDH}`),

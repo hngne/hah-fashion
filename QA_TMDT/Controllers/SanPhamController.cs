@@ -20,9 +20,9 @@ namespace QA_TMDT.Controllers
         }
         [HttpGet]
         [Route("GetAllSP")]
-        public async Task<IActionResult> getallsp([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null)
+        public async Task<IActionResult> getallsp([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? key = null, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null)
         {
-            var result = await _service.GetAllSP(page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
+            var result = await _service.GetAllSP(page, pageSize, key, minPrice, maxPrice, maKichThuoc, maMauSac);
             return Ok(APIResponse<PageResult<SanPhamResponse>>.OK("Lấy danh sách sản phẩm thành công", result));
         }
         [HttpGet]
@@ -31,6 +31,18 @@ namespace QA_TMDT.Controllers
         {
             var result = await _service.GetByMaDM(maDM, page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
             return Ok(APIResponse<PageResult<SanPhamResponse>>.OK("Lấy danh sách sản phẩm theo mã danh mục thành công", result));
+        }
+        [HttpGet]
+        [Route("Get-by-tenSP")]
+        public async Task<IActionResult> getbytenspquery([FromQuery(Name = "key")] string? key, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return BadRequest(APIResponse<PageResult<SanPhamResponse>>.Fail("Từ khóa tìm kiếm không được để trống"));
+            }
+
+            var result = await _service.GetByTenSP(key, page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
+            return Ok(APIResponse<PageResult<SanPhamResponse>>.OK("Lấy danh sách sản phẩm theo tên sản phẩm thành công", result));
         }
         [HttpGet]
         [Route("Get-by-tenSP/{tenSP}")]

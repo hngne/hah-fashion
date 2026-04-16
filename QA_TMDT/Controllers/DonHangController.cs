@@ -27,9 +27,9 @@ namespace QA_TMDT.Controllers
         [HttpGet]
         [Route("Admin-getAll")]
         [Authorize(Roles = "admin")]
-        public async Task<IActionResult> getall()
+        public async Task<IActionResult> getall([FromQuery] string? maDonHang, [FromQuery] string? trangThai)
         {
-            var result = await _service.GetAll();
+            var result = await _service.GetAll(maDonHang, trangThai);
             return Ok(APIResponse<IEnumerable<DonHangResponse>>.OK("Lấy danh sách đơn hàng thành công", result!));
         }
         [HttpGet]

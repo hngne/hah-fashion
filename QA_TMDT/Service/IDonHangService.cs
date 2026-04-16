@@ -5,7 +5,7 @@ namespace QA_TMDT.Service
 {
     public interface IDonHangService
     {
-        Task<IEnumerable<DonHangResponse>> GetAll();
+        Task<IEnumerable<DonHangResponse>> GetAll(string? maDonHang = null, string? trangThai = null);
         Task<(bool success, string message, DonHangResponse? response)> CreateDonHang(DatHangRequest request);
         Task<DonHangResponse?> GetDonHangByMaDH(string maDH);
         Task<IEnumerable<DonHangResponse>?> GetDonHangByMaTK(string maTK);

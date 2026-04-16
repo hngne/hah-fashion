@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using QA_TMDT.Dtos.Response;
 using QA_TMDT.Helper;
 using QA_TMDT.Model;
 
@@ -11,14 +12,41 @@ namespace QA_TMDT.Repository.Impl
         {
             _context = context;
         }
-        private IQueryable<SanPham> BuildBaseQuery()
+
+        private IQueryable<SanPham> BuildListQuery()
         {
-            return _context.SanPhams
-                .Include(img => img.AnhSps)
-                .Include(dm => dm.MaDanhMucNavigation)
-                .Include(ctsp => ctsp.ChiTietSps)
-                .Include(km => km.ChiTietKms).ThenInclude(km => km.MaKhuyenMaiNavigation)
-                .AsNoTracking();
+            return _context.SanPhams.AsNoTracking();
+        }
+
+        private IQueryable<SanPhamResponse> BuildSummaryQuery(IQueryable<SanPham> query)
+        {
+            var now = DateTime.Now;
+
+            return query.Select(sp => new SanPhamResponse
+            {
+                MaSp = sp.MaSp,
+                TenSp = sp.TenSp,
+                MaDanhMuc = sp.MaDanhMuc,
+                TenDanhMuc = sp.MaDanhMucNavigation != null ? sp.MaDanhMucNavigation.TenDanhMuc : "N/a",
+                TenTimKiem = sp.TenTimKiem,
+                GiaGoc = sp.GiaGoc,
+                GiaKm = sp.GiaGoc - (sp.GiaGoc * (
+                    sp.ChiTietKms
+                        .Where(ct =>
+                            ct.MaKhuyenMaiNavigation != null &&
+                            ct.MaKhuyenMaiNavigation.NgayBatDau <= now &&
+                            ct.MaKhuyenMaiNavigation.NgayKetThuc >= now)
+                        .Select(ct => (int?)ct.PhanTramGiam)
+                        .Max() ?? 0
+                ) / 100m),
+                MoTa = sp.MoTa,
+                ChatLieu = sp.ChatLieu,
+                AnhDaiDien = sp.AnhSps
+                    .OrderBy(img => img.MaAnh)
+                    .Select(img => img.DuongDan)
+                    .FirstOrDefault(),
+                SoBienThe = sp.ChiTietSps.Count(),
+            });
         }
 
         private IQueryable<SanPham> ApplyPriceFilter(IQueryable<SanPham> query, decimal? minPrice, decimal? maxPrice)
@@ -58,23 +86,49 @@ namespace QA_TMDT.Repository.Impl
                     (!maMauSac.HasValue || ct.MaMauSac == maMauSac.Value)));
         }
 
-        public async Task<(List<SanPham> data, int totalItem)> GetAllSP(int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
+        private IQueryable<SanPham> ApplySearchFilter(IQueryable<SanPham> query, string? key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return query;
+            }
+
+            var keySearch = RemoveVNI.ConvertToUnsign(key).Trim().ToLower();
+            if (string.IsNullOrWhiteSpace(keySearch))
+            {
+                return query;
+            }
+
+            return query.Where(sp =>
+                sp.TenTimKiem != null &&
+                (sp.TenTimKiem == keySearch ||
+                sp.TenTimKiem.StartsWith($"{keySearch} ") ||
+                sp.TenTimKiem.EndsWith($" {keySearch}") ||
+                sp.TenTimKiem.Contains($" {keySearch} ")));
+        }
+
+        public async Task<(List<SanPhamResponse> data, int totalItem)> GetAllSP(int page, int pageSize, string? key = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
         {
             var query = ApplyVariantFilter(
-                ApplyPriceFilter(BuildBaseQuery(), minPrice, maxPrice),
+                ApplyPriceFilter(
+                    ApplySearchFilter(BuildListQuery(), key),
+                    minPrice,
+                    maxPrice
+                ),
                 maKichThuoc,
                 maMauSac
             );
 
-            var ToTalItem = await query.CountAsync();
+            var totalItem = await query.CountAsync();
 
-            var Items = await query
+            var items = await BuildSummaryQuery(query)
                 .OrderByDescending(p => p.TenSp)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-            return (Items, ToTalItem);
+            return (items, totalItem);
         }
+
         public async Task<bool> CreateSP(SanPham sp)
         {
             try
@@ -88,12 +142,13 @@ namespace QA_TMDT.Repository.Impl
                 return false;
             }
         }
+
         public async Task<bool> CreateVariant(ChiTietSp ctsp)
         {
             try
             {
                 var exist = await _context.ChiTietSps.AnyAsync(c => c.MaSp == ctsp.MaSp && c.MaKichThuoc == ctsp.MaKichThuoc && c.MaMauSac == ctsp.MaMauSac);
-                if(exist)
+                if (exist)
                 {
                     return false;
                 }
@@ -107,10 +162,12 @@ namespace QA_TMDT.Repository.Impl
                 return false;
             }
         }
+
         public async Task<bool> CheckExistMaSP(string masp)
         {
             return await _context.SanPhams.AnyAsync(sp => sp.MaSp == masp);
         }
+
         public async Task<SanPham?> GetFullInFoByMaSP(string masp)
         {
             return await _context.SanPhams
@@ -123,7 +180,8 @@ namespace QA_TMDT.Repository.Impl
                 .ThenInclude(c => c.MaMauSacNavigation)
                 .FirstOrDefaultAsync(sp => sp.MaSp == masp);
         }
-        public async Task<(List<SanPham>? data, int totalItem)> GetByMaDM(int maDM, int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
+
+        public async Task<(List<SanPhamResponse> data, int totalItem)> GetByMaDM(int maDM, int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
         {
             var dmDad = await _context.DanhMucs
                 .AsNoTracking()
@@ -133,7 +191,7 @@ namespace QA_TMDT.Repository.Impl
 
             var query = ApplyVariantFilter(
                 ApplyPriceFilter(
-                    BuildBaseQuery().Where(dm => dmDad.Contains((int)dm.MaDanhMuc!)),
+                    BuildListQuery().Where(dm => dmDad.Contains((int)dm.MaDanhMuc!)),
                     minPrice,
                     maxPrice
                 ),
@@ -141,33 +199,28 @@ namespace QA_TMDT.Repository.Impl
                 maMauSac
             );
 
-            var ToTalItems = await query.CountAsync();
+            var totalItem = await query.CountAsync();
 
-            var Items = await query
+            var items = await BuildSummaryQuery(query)
                 .OrderByDescending(sp => sp.TenSp)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-            return (Items, ToTalItems);
+            return (items, totalItem);
         }
-        public async Task<(List<SanPham>? data, int totalItem)> GetByTenSP(string tenSP, int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
+
+        public async Task<(List<SanPhamResponse> data, int totalItem)> GetByTenSP(string tenSP, int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
         {
-            string keySearch = RemoveVNI.ConvertToUnsign(tenSP).ToLower();
+            string keySearch = RemoveVNI.ConvertToUnsign(tenSP).Trim().ToLower();
 
             if (string.IsNullOrWhiteSpace(keySearch))
             {
-                return (new List<SanPham>(), 0);
+                return (new List<SanPhamResponse>(), 0);
             }
 
             var query = ApplyVariantFilter(
                 ApplyPriceFilter(
-                    BuildBaseQuery()
-                    .Where(sp =>
-                        sp.TenTimKiem != null &&
-                        (sp.TenTimKiem == keySearch ||
-                        sp.TenTimKiem.StartsWith($"{keySearch} ") ||
-                        sp.TenTimKiem.EndsWith($" {keySearch}") ||
-                        sp.TenTimKiem.Contains($" {keySearch} "))),
+                    ApplySearchFilter(BuildListQuery(), keySearch),
                     minPrice,
                     maxPrice
                 ),
@@ -175,19 +228,21 @@ namespace QA_TMDT.Repository.Impl
                 maMauSac
             );
 
-            var ToTalItems = await query.CountAsync();
+            var totalItem = await query.CountAsync();
 
-            var Items = await query
+            var items = await BuildSummaryQuery(query)
                 .OrderByDescending(sp => sp.TenSp)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-            return (Items, ToTalItems);
+            return (items, totalItem);
         }
+
         public async Task<ChiTietSp?> GetChiTietSPByMaCTSP(string maCTSP)
         {
             return await _context.ChiTietSps.Include(s => s.MaKichThuocNavigation).Include(c => c.MaMauSacNavigation).FirstOrDefaultAsync(ctsp => ctsp.MaChiTietSp == maCTSP);
         }
+
         public async Task<bool> UpdateStockCTSP(string maCTSP, int soluongthaydoi)
         {
             try
@@ -211,6 +266,7 @@ namespace QA_TMDT.Repository.Impl
                 return false;
             }
         }
+
         public async Task<bool> UpdateSP(SanPham sp)
         {
             try
@@ -218,12 +274,13 @@ namespace QA_TMDT.Repository.Impl
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("Lỗi cần fix" + ex.ToString());
                 return false;
             }
         }
+
         public async Task<bool> UpdateCTSP(ChiTietSp ctsp)
         {
             try
@@ -237,6 +294,7 @@ namespace QA_TMDT.Repository.Impl
                 return false;
             }
         }
+
         public async Task<bool> DeleteSP(string maSP)
         {
             try
@@ -263,10 +321,12 @@ namespace QA_TMDT.Repository.Impl
                 return false;
             }
         }
+
         public async Task<bool> CheckExistCTSP(string maCTSP)
         {
             return await _context.ChiTietSps.AnyAsync(ctsp => ctsp.MaChiTietSp == maCTSP);
         }
+
         public async Task<bool> CheckDMExist(int? maDM)
         {
             return await _context.DanhMucs.AnyAsync(dm => dm.MaDanhMuc == maDM);

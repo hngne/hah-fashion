@@ -9,6 +9,7 @@ import type {
 } from "../types";
 
 interface ProductListParams {
+  key?: string;
   minPrice?: number;
   maxPrice?: number;
   maKichThuoc?: number;
@@ -35,7 +36,7 @@ export const sanPhamService = {
     pageSize = 10,
     filters: ProductListParams = {},
   ): Promise<APIResponse<PageResult<ProductSummary>>> =>
-    api.get(`/SanPham/Get-by-tenSP/${tenSP}`, { params: { page, pageSize, ...filters } }),
+    api.get("/SanPham/Get-by-tenSP", { params: { page, pageSize, key: tenSP, ...filters } }),
   getFullInfo: async (maSP: string): Promise<APIResponse<ProductDetail>> =>
     api.get(`/SanPham/Get-fullinfo-by-maSP/${maSP}`),
   create: async (formData: FormData): Promise<APIResponse<ProductDetail>> =>

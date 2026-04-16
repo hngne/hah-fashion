@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace QA_TMDT.Model;
 
@@ -22,6 +23,9 @@ public partial class TaiKhoan
     public string? DiaChi { get; set; }
 
     public DateTime? NgayTao { get; set; }
+
+    [NotMapped]
+    public bool TrangThai { get; set; } = true;
 
     public virtual ICollection<DanhGium> DanhGia { get; set; } = new List<DanhGium>();
 

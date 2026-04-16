@@ -41,6 +41,7 @@ namespace QA_TMDT.Repository.Impl
                 ) / 100m),
                 MoTa = sp.MoTa,
                 ChatLieu = sp.ChatLieu,
+                TrangThai = sp.TrangThai,
                 AnhDaiDien = sp.AnhSps
                     .OrderBy(img => img.MaAnh)
                     .Select(img => img.DuongDan)
@@ -107,11 +108,24 @@ namespace QA_TMDT.Repository.Impl
                 sp.TenTimKiem.Contains($" {keySearch} ")));
         }
 
-        public async Task<(List<SanPhamResponse> data, int totalItem)> GetAllSP(int page, int pageSize, string? key = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
+        private IQueryable<SanPham> ApplyStatusFilter(IQueryable<SanPham> query, bool? status)
+        {
+            if (!status.HasValue)
+            {
+                return query;
+            }
+
+            return query.Where(sp => sp.TrangThai == status.Value);
+        }
+
+        public async Task<(List<SanPhamResponse> data, int totalItem)> GetAllSP(int page, int pageSize, string? key = null, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
         {
             var query = ApplyVariantFilter(
                 ApplyPriceFilter(
-                    ApplySearchFilter(BuildListQuery(), key),
+                    ApplyStatusFilter(
+                        ApplySearchFilter(BuildListQuery(), key),
+                        status
+                    ),
                     minPrice,
                     maxPrice
                 ),
@@ -181,7 +195,7 @@ namespace QA_TMDT.Repository.Impl
                 .FirstOrDefaultAsync(sp => sp.MaSp == masp);
         }
 
-        public async Task<(List<SanPhamResponse> data, int totalItem)> GetByMaDM(int maDM, int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
+        public async Task<(List<SanPhamResponse> data, int totalItem)> GetByMaDM(int maDM, int page, int pageSize, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
         {
             var dmDad = await _context.DanhMucs
                 .AsNoTracking()
@@ -191,7 +205,10 @@ namespace QA_TMDT.Repository.Impl
 
             var query = ApplyVariantFilter(
                 ApplyPriceFilter(
-                    BuildListQuery().Where(dm => dmDad.Contains((int)dm.MaDanhMuc!)),
+                    ApplyStatusFilter(
+                        BuildListQuery().Where(dm => dmDad.Contains((int)dm.MaDanhMuc!)),
+                        status
+                    ),
                     minPrice,
                     maxPrice
                 ),
@@ -209,7 +226,7 @@ namespace QA_TMDT.Repository.Impl
             return (items, totalItem);
         }
 
-        public async Task<(List<SanPhamResponse> data, int totalItem)> GetByTenSP(string tenSP, int page, int pageSize, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
+        public async Task<(List<SanPhamResponse> data, int totalItem)> GetByTenSP(string tenSP, int page, int pageSize, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
         {
             string keySearch = RemoveVNI.ConvertToUnsign(tenSP).Trim().ToLower();
 
@@ -220,7 +237,10 @@ namespace QA_TMDT.Repository.Impl
 
             var query = ApplyVariantFilter(
                 ApplyPriceFilter(
-                    ApplySearchFilter(BuildListQuery(), keySearch),
+                    ApplyStatusFilter(
+                        ApplySearchFilter(BuildListQuery(), keySearch),
+                        status
+                    ),
                     minPrice,
                     maxPrice
                 ),

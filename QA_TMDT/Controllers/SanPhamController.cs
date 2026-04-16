@@ -20,36 +20,52 @@ namespace QA_TMDT.Controllers
         }
         [HttpGet]
         [Route("GetAllSP")]
-        public async Task<IActionResult> getallsp([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? key = null, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null)
+        public async Task<IActionResult> getallsp([FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] string? key = null, [FromQuery(Name = "status")] bool? status = null, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null)
         {
-            var result = await _service.GetAllSP(page, pageSize, key, minPrice, maxPrice, maKichThuoc, maMauSac);
+            var result = await _service.GetAllSP(page, pageSize, key, status, minPrice, maxPrice, maKichThuoc, maMauSac);
             return Ok(APIResponse<PageResult<SanPhamResponse>>.OK("Lấy danh sách sản phẩm thành công", result));
         }
         [HttpGet]
         [Route("Get-by-maDM/{maDM}")]
-        public async Task<IActionResult> getbymadm([FromRoute] int maDM, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null)
+        public async Task<IActionResult> getbymadm([FromRoute] int maDM, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery(Name = "status")] bool? status = null, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null)
         {
-            var result = await _service.GetByMaDM(maDM, page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
+            var result = await _service.GetByMaDM(maDM, page, pageSize, status, minPrice, maxPrice, maKichThuoc, maMauSac);
             return Ok(APIResponse<PageResult<SanPhamResponse>>.OK("Lấy danh sách sản phẩm theo mã danh mục thành công", result));
         }
         [HttpGet]
         [Route("Get-by-tenSP")]
-        public async Task<IActionResult> getbytenspquery([FromQuery(Name = "key")] string? key, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null)
+        public async Task<IActionResult> getbytenspquery([FromQuery(Name = "key")] string? key, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery(Name = "status")] bool? status = null, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null)
         {
             if (string.IsNullOrWhiteSpace(key))
             {
                 return BadRequest(APIResponse<PageResult<SanPhamResponse>>.Fail("Từ khóa tìm kiếm không được để trống"));
             }
 
-            var result = await _service.GetByTenSP(key, page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
+            var result = await _service.GetByTenSP(key, page, pageSize, status, minPrice, maxPrice, maKichThuoc, maMauSac);
             return Ok(APIResponse<PageResult<SanPhamResponse>>.OK("Lấy danh sách sản phẩm theo tên sản phẩm thành công", result));
         }
         [HttpGet]
         [Route("Get-by-tenSP/{tenSP}")]
-        public async Task<IActionResult> getbytensp([FromRoute] string tenSP, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null)
+        public async Task<IActionResult> getbytensp([FromRoute] string tenSP, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery(Name = "status")] bool? status = null, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null)
         {
-            var result = await _service.GetByTenSP(tenSP, page, pageSize, minPrice, maxPrice, maKichThuoc, maMauSac);
+            var result = await _service.GetByTenSP(tenSP, page, pageSize, status, minPrice, maxPrice, maKichThuoc, maMauSac);
             return Ok(APIResponse<PageResult<SanPhamResponse>>.OK("Lấy danh sách sản phẩm theo tên sản phẩm thành công", result));
+        }
+        [HttpGet]
+        [Route("Get-fullinfo-by-maSP")]
+        public async Task<IActionResult> getfullinfobymaspquery([FromQuery(Name = "id")] string? id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest(APIResponse<SanPhamResponse>.Fail("Mã sản phẩm không được để trống"));
+            }
+
+            var result = await _service.GetFullInFoByMaSP(id);
+            if (result == null)
+            {
+                return NotFound(APIResponse<SanPhamResponse>.Fail("Sản phẩm không tồn tại"));
+            }
+            return Ok(APIResponse<SanPhamResponse>.OK("Lấy thông tin sản phẩm thành công", result));
         }
         [HttpGet]
         [Route("Get-fullinfo-by-maSP/{maSP}")]

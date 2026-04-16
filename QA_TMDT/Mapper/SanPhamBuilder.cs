@@ -19,6 +19,7 @@ namespace QA_TMDT.Mapper
                 TenTimKiem = s.TenTimKiem,
                 MoTa = s.MoTa,
                 ChatLieu = s.ChatLieu,
+                TrangThai = s.TrangThai,
                 AnhDaiDien = s.AnhSps.FirstOrDefault()?.DuongDan,
                 SoBienThe = s.ChiTietSps.Count,
                 DuongDanAnhSPs = s.AnhSps.Select(img => img.DuongDan).ToList(),

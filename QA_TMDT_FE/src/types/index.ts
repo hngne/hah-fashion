@@ -106,6 +106,7 @@ export interface ProductSummary {
   giaKm: number;
   moTa?: string | null;
   chatLieu?: string | null;
+  trangThai?: boolean | null;
   anhDaiDien?: string | null;
   soBienThe?: number;
   duongDanAnhSPs?: string[];

@@ -11,6 +11,7 @@
         public decimal GiaKm { get; set; }
         public string? MoTa { get; set; }
         public string? ChatLieu { get; set; }
+        public bool? TrangThai { get; set; }
         public string? AnhDaiDien { get; set; }
         public int SoBienThe { get; set; }
         public List<string> DuongDanAnhSPs { get; set; } = new List<string>();

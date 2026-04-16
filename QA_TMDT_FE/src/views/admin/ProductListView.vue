@@ -485,7 +485,7 @@ async function loadProducts() {
   try {
     const keyword = searchQuery.value.trim();
     if (keyword && searchType.value === "code") {
-      const response = await sanPhamService.getFullInfo(keyword);
+      const response = await sanPhamService.searchByCode(keyword);
       items.value = response.data ? [response.data] : [];
       totalItems.value = items.value.length;
       totalPages.value = 1;

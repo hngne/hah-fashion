@@ -538,8 +538,8 @@ const fetchProducts = async () => {
   try {
     const q = searchQuery.value.trim();
     if (q && searchType.value === "code") {
-      // Search by product code: use getFullInfo
-      const res: any = await sanPhamService.getFullInfo(q);
+      // Search by product code via query params.
+      const res: any = await sanPhamService.searchByCode(q);
       if (res.success && res.data) {
         items.value = [res.data];
         totalItem.value = 1;

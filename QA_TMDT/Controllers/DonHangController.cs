@@ -75,6 +75,30 @@ namespace QA_TMDT.Controllers
         }
 
         [HttpPut]
+        [Route("trangthai")]
+        [Authorize(Roles = "admin")]
+        public async Task<IActionResult> updatestatusbyqueryasync([FromQuery] string? maDonHang, [FromQuery] string? trangThaiMoi)
+        {
+            if (string.IsNullOrWhiteSpace(maDonHang))
+            {
+                return BadRequest(APIResponse<DonHangResponse>.Fail("Mã đơn hàng không được để trống"));
+            }
+
+            if (string.IsNullOrWhiteSpace(trangThaiMoi))
+            {
+                return BadRequest(APIResponse<DonHangResponse>.Fail("Trạng thái mới không được để trống"));
+            }
+
+            var request = new UpdateTrangThaiDonRequest { TrangThaiMoi = trangThaiMoi };
+            var result = await _service.UpdateTrangThaiDonHang(maDonHang, request);
+            if (!result.Success)
+            {
+                return BadRequest(APIResponse<DonHangResponse>.Fail(result.Message));
+            }
+            return Ok(APIResponse<DonHangResponse>.OK(result.Message, result.response!));
+        }
+
+        [HttpPut]
         [Route("trangthai/{maDonHang}")]
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> updatestatusasync(string maDonHang, [FromBody] UpdateTrangThaiDonRequest request)

@@ -21,7 +21,9 @@ export const donHangService = {
     maDH: string,
     trangThaiMoi: string,
   ): Promise<APIResponse<Order>> =>
-    api.put(`/DonHang/trangthai/${maDH}`, { trangThaiMoi }),
+    api.put("/DonHang/trangthai", null, {
+      params: { maDonHang: maDH, trangThaiMoi },
+    }),
   // Delete order (admin)
   delete: async (maDH: string): Promise<APIResponse<string>> =>
     api.delete(`/DonHang?maDH=${maDH}`),

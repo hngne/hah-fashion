@@ -17,9 +17,9 @@ namespace QA_TMDT.Service.Impl
             _repo = repo;
             _cloudinary = cloudinary;
         }
-        public async Task<PageResult<SanPhamResponse>> GetAllSP(int page, int pageSize, string? key = null, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
+        public async Task<PageResult<SanPhamResponse>> GetAllSP(int page, int pageSize, string? key = null, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null, string? sort = null)
         {
-            var (Items, TotalItem) = await _repo.GetAllSP(page, pageSize, key, status, minPrice, maxPrice, maKichThuoc, maMauSac);
+            var (Items, TotalItem) = await _repo.GetAllSP(page, pageSize, key, status, minPrice, maxPrice, maKichThuoc, maMauSac, sort);
 
             return new PageResult<SanPhamResponse>
             {
@@ -148,9 +148,9 @@ namespace QA_TMDT.Service.Impl
             var sp = await _repo.GetFullInFoByMaSP(masp);
             return SanPhamBuilder.ToResponse(sp!);
         }
-        public async Task<PageResult<SanPhamResponse>> GetByMaDM(int maDM, int page, int pageSize, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
+        public async Task<PageResult<SanPhamResponse>> GetByMaDM(int maDM, int page, int pageSize, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null, string? sort = null)
         {
-            var (Items, TotalItem) = await _repo.GetByMaDM(maDM, page, pageSize, status, minPrice, maxPrice, maKichThuoc, maMauSac);
+            var (Items, TotalItem) = await _repo.GetByMaDM(maDM, page, pageSize, status, minPrice, maxPrice, maKichThuoc, maMauSac, sort);
 
             return new PageResult<SanPhamResponse>
             {
@@ -160,9 +160,9 @@ namespace QA_TMDT.Service.Impl
                 pageSize = pageSize
             };
         }
-        public async Task<PageResult<SanPhamResponse>> GetByTenSP(string tenSP, int page, int pageSize, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
+        public async Task<PageResult<SanPhamResponse>> GetByTenSP(string tenSP, int page, int pageSize, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null, string? sort = null)
         {
-            var (Items, TotalItem) = await _repo.GetByTenSP(tenSP, page, pageSize, status, minPrice, maxPrice, maKichThuoc, maMauSac);
+            var (Items, TotalItem) = await _repo.GetByTenSP(tenSP, page, pageSize, status, minPrice, maxPrice, maKichThuoc, maMauSac, sort);
             return new PageResult<SanPhamResponse>
             {
                 item = Items,

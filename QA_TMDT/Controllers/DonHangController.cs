@@ -45,13 +45,29 @@ namespace QA_TMDT.Controllers
             return Ok(APIResponse<IEnumerable<DonHangResponse>>.OK("Lấy danh sách đơn hàng thành công", result));
         }
         [HttpGet]
+        [Route("get-dh-by")]
+        public async Task<IActionResult> getbymaDHquery([FromQuery(Name = "id")] string? id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest(APIResponse<DonHangResponse>.Fail("Mã đơn hàng không được để trống"));
+            }
+
+            var result = await _service.GetDonHangByMaDH(id);
+            if (result == null)
+            {
+                return BadRequest(APIResponse<DonHangResponse>.Fail("Không có đơn hàng này"));
+            }
+            return Ok(APIResponse<DonHangResponse>.OK("Lấy thông tin đơn hàng thành công", result));
+        }
+        [HttpGet]
         [Route("get-dh-by/{maDH}")]
         public async Task<IActionResult> getbymaDH(string maDH)
         {
             var result = await _service.GetDonHangByMaDH(maDH);
             if (result == null)
             {
-                return BadRequest(APIResponse<DonHangResponse>.Fail("Không có tài khoản này"));
+                return BadRequest(APIResponse<DonHangResponse>.Fail("Không có đơn hàng này"));
             }
             return Ok(APIResponse<DonHangResponse>.OK("Lấy thông tin đơn hàng thành công", result));
         }

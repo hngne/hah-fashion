@@ -483,7 +483,16 @@ async function loadProducts() {
   errorMessage.value = "";
 
   try {
-    const keyword = searchQuery.value.trim();
+    const rawKeyword = searchQuery.value;
+    const keyword = rawKeyword.trim();
+    if (!keyword && rawKeyword.length > 0) {
+      items.value = [];
+      totalItems.value = 0;
+      totalPages.value = 1;
+      errorMessage.value = "Vui lòng nhập từ khóa tìm kiếm hợp lệ, không chỉ nhập khoảng trắng.";
+      return;
+    }
+
     if (keyword && searchType.value === "code") {
       const response = await sanPhamService.searchByCode(keyword);
       items.value = response.data ? [response.data] : [];

@@ -15,7 +15,7 @@ export const donHangService = {
     api.get("/DonHang/Admin-getAll", { params }),
   // Get order by ID (detail)
   getById: async (maDH: string): Promise<APIResponse<Order>> =>
-    api.get(`/DonHang/get-dh-by/${maDH}`),
+    api.get("/DonHang/get-dh-by", { params: { id: maDH } }),
   // Update order status (admin)
   updateStatus: async (
     maDH: string,

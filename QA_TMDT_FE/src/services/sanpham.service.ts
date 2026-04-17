@@ -15,6 +15,7 @@ interface ProductListParams {
   maxPrice?: number;
   maKichThuoc?: number;
   maMauSac?: number;
+  sort?: string;
 }
 
 export const sanPhamService = {

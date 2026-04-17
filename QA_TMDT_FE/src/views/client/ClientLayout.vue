@@ -55,10 +55,16 @@
 
           <!-- Right Actions -->
           <div class="flex items-center space-x-3">
-            <div class="hidden md:flex items-center bg-gray-100 rounded-full px-3 py-1.5">
+            <div class="relative hidden md:flex items-center bg-gray-100 rounded-full px-3 py-1.5">
               <SearchIcon class="h-4 w-4 text-gray-400" stroke-width="2" />
-              <input v-model="searchQuery" @keyup.enter="handleSearch" type="text" placeholder="Tìm kiếm sản phẩm..."
+              <input v-model="searchQuery" @input="searchNotice = ''" @keyup.enter="handleSearch" type="text" placeholder="Tìm kiếm sản phẩm..."
                 class="bg-transparent border-none text-sm text-[#111827] placeholder-gray-400 ml-2 w-40 focus:outline-none focus:w-56 transition-all" />
+              <p
+                v-if="searchNotice"
+                class="absolute left-0 top-full mt-2 w-64 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700 shadow-sm"
+              >
+                {{ searchNotice }}
+              </p>
             </div>
             <RouterLink to="/cart" class="relative p-2 text-gray-500 hover:text-[#111827] transition">
               <ShoppingBagIcon class="h-5 w-5" stroke-width="2" />
@@ -224,11 +230,19 @@ const cartStore = useCartStore();
 const userMenuOpen = ref(false);
 
 const searchQuery = ref("");
+const searchNotice = ref("");
 const handleSearch = () => {
+  const rawValue = searchQuery.value;
   const q = searchQuery.value.trim();
+  if (!q && rawValue.length > 0) {
+    searchNotice.value = "Vui lòng nhập từ khóa hợp lệ.";
+    return;
+  }
+
   if (q) {
     router.push({ name: "product-search", query: { q } });
     searchQuery.value = "";
+    searchNotice.value = "";
   }
 };
 

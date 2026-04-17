@@ -318,7 +318,7 @@ const priceKey = computed(() =>
   typeof route.query.price === "string" ? route.query.price : "",
 );
 
-const useClientAggregation = computed(() => sortValue.value !== "default");
+const useClientAggregation = computed(() => false);
 
 const currentPage = computed(() => {
   const rawValue = Number(route.query.page || 1);
@@ -388,6 +388,10 @@ const currentVariantParams = computed(() => {
 
   return filters;
 });
+
+const currentSortParams = computed(() =>
+  sortValue.value !== "default" ? { sort: sortValue.value } : {},
+);
 
 const pageTitle = computed(() => {
   if (activeSearchQuery.value) {
@@ -484,6 +488,7 @@ async function fetchProductPage(page: number, pageSize: number) {
   const filters = {
     ...currentPriceParams.value,
     ...currentVariantParams.value,
+    ...currentSortParams.value,
   };
 
   if (activeSearchQuery.value) {
@@ -591,7 +596,14 @@ function pushRoute(next: {
 }
 
 function doSearch() {
+  const rawValue = searchInput.value;
   const q = searchInput.value.trim();
+  if (!q && rawValue.length > 0) {
+    errorMessage.value = "Vui lòng nhập từ khóa tìm kiếm hợp lệ, không chỉ nhập khoảng trắng.";
+    return;
+  }
+
+  errorMessage.value = "";
   pushRoute({
     maDM: null,
     q,

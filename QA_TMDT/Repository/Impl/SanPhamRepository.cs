@@ -118,7 +118,19 @@ namespace QA_TMDT.Repository.Impl
             return query.Where(sp => sp.TrangThai == status.Value);
         }
 
-        public async Task<(List<SanPhamResponse> data, int totalItem)> GetAllSP(int page, int pageSize, string? key = null, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
+        private IQueryable<SanPhamResponse> ApplySort(IQueryable<SanPhamResponse> query, string? sort)
+        {
+            return sort?.Trim().ToLower() switch
+            {
+                "name-asc" or "ten-az" or "ten-a-z" => query.OrderBy(sp => sp.TenSp),
+                "name-desc" or "ten-za" or "ten-z-a" => query.OrderByDescending(sp => sp.TenSp),
+                "price-asc" or "gia-asc" => query.OrderBy(sp => sp.GiaKm).ThenBy(sp => sp.TenSp),
+                "price-desc" or "gia-desc" => query.OrderByDescending(sp => sp.GiaKm).ThenBy(sp => sp.TenSp),
+                _ => query.OrderByDescending(sp => sp.TenSp),
+            };
+        }
+
+        public async Task<(List<SanPhamResponse> data, int totalItem)> GetAllSP(int page, int pageSize, string? key = null, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null, string? sort = null)
         {
             var query = ApplyVariantFilter(
                 ApplyPriceFilter(
@@ -135,8 +147,7 @@ namespace QA_TMDT.Repository.Impl
 
             var totalItem = await query.CountAsync();
 
-            var items = await BuildSummaryQuery(query)
-                .OrderByDescending(p => p.TenSp)
+            var items = await ApplySort(BuildSummaryQuery(query), sort)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -195,7 +206,7 @@ namespace QA_TMDT.Repository.Impl
                 .FirstOrDefaultAsync(sp => sp.MaSp == masp);
         }
 
-        public async Task<(List<SanPhamResponse> data, int totalItem)> GetByMaDM(int maDM, int page, int pageSize, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
+        public async Task<(List<SanPhamResponse> data, int totalItem)> GetByMaDM(int maDM, int page, int pageSize, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null, string? sort = null)
         {
             var dmDad = await _context.DanhMucs
                 .AsNoTracking()
@@ -218,15 +229,14 @@ namespace QA_TMDT.Repository.Impl
 
             var totalItem = await query.CountAsync();
 
-            var items = await BuildSummaryQuery(query)
-                .OrderByDescending(sp => sp.TenSp)
+            var items = await ApplySort(BuildSummaryQuery(query), sort)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
             return (items, totalItem);
         }
 
-        public async Task<(List<SanPhamResponse> data, int totalItem)> GetByTenSP(string tenSP, int page, int pageSize, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null)
+        public async Task<(List<SanPhamResponse> data, int totalItem)> GetByTenSP(string tenSP, int page, int pageSize, bool? status = null, decimal? minPrice = null, decimal? maxPrice = null, int? maKichThuoc = null, int? maMauSac = null, string? sort = null)
         {
             string keySearch = RemoveVNI.ConvertToUnsign(tenSP).Trim().ToLower();
 
@@ -250,8 +260,7 @@ namespace QA_TMDT.Repository.Impl
 
             var totalItem = await query.CountAsync();
 
-            var items = await BuildSummaryQuery(query)
-                .OrderByDescending(sp => sp.TenSp)
+            var items = await ApplySort(BuildSummaryQuery(query), sort)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

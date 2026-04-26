@@ -24,6 +24,22 @@ namespace QA_TMDT.Controllers
             return Ok(APIResponse<IEnumerable<DanhMucResponse>>.OK("Lấy danh sách danh mục thành công", data));
         }
         [HttpGet]
+        [Route("by-madm")]
+        public async Task<IActionResult> getdmbymadmqueryasync([FromQuery(Name = "id")] int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest(APIResponse<DanhMucResponse>.Fail("Mã danh mục không được để trống"));
+            }
+
+            var data = await _service.GetDMByMaDM(id.Value);
+            if(data == null)
+            {
+                return NotFound(APIResponse<DanhMucResponse>.Fail("Danh mục này không tồn tại"));
+            }
+            return Ok(APIResponse<DanhMucResponse>.OK("Lấy thông tin danh mục thành công", data));
+        }
+        [HttpGet]
         [Route("by-madm/{madm}")]
         public async Task<IActionResult> getdmbymadmasync(int madm)
         {
@@ -33,6 +49,22 @@ namespace QA_TMDT.Controllers
                 return NotFound(APIResponse<DanhMucResponse>.Fail("Danh mục này không tồn tại"));
             }
             return Ok(APIResponse<DanhMucResponse>.OK("Lấy thông tin danh mục thành công", data));
+        }
+        [HttpGet]
+        [Route("by-tendm")]
+        public async Task<IActionResult> getbytendmqueryasync([FromQuery(Name = "name")] string? name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return BadRequest(APIResponse<IEnumerable<DanhMucResponse>>.Fail("Tên danh mục không được để trống"));
+            }
+
+            var data = await _service.GetDMByTenDM(name);
+            if (data == null)
+            {
+                return NotFound(APIResponse<IEnumerable<DanhMucResponse>>.Fail("Không có danh mục nào"));
+            }
+            return Ok(APIResponse<IEnumerable<DanhMucResponse>>.OK("danh sách danh mục", data));
         }
         [HttpGet]
         [Route("by-tendm/{tendm}")]

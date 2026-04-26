@@ -24,6 +24,22 @@ namespace QA_TMDT.Controllers
             return Ok(APIResponse<IEnumerable<KhuyenMaiResponse>>.OK("Lấy danh sách khuyến mãi thành công", data));
         }
         [HttpGet]
+        [Route("by-makm")]
+        public async Task<IActionResult> getkmbymakmquery([FromQuery(Name = "id")] string? id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest(APIResponse<KhuyenMaiResponse>.Fail("Mã khuyến mãi không được để trống"));
+            }
+
+            var data = await _service.GetKMByMaKM(id);
+            if (data == null)
+            {
+                return NotFound(APIResponse<KhuyenMaiResponse>.Fail($"Không tìm thấy khuyến mãi có mã {id}"));
+            }
+            return Ok(APIResponse<KhuyenMaiResponse>.OK("Đã tìm thấy khuyến mãi", data));
+        }
+        [HttpGet]
         [Route("by-makm/{makm}")]
         public async Task<IActionResult> getkmbymakm(string makm)
         {
@@ -70,6 +86,22 @@ namespace QA_TMDT.Controllers
             return Ok(data.message);
         }
         [HttpGet]
+        [Route("chitiet/by-makm")]
+        public async Task<IActionResult> getchitietbymakmquery([FromQuery(Name = "id")] string? id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest(APIResponse<ChiTietKhuyenMaiResponse>.Fail("Mã khuyến mãi không được để trống"));
+            }
+
+            var data = await _service.GetChiTietKMByMaKM(id);
+            if (data == null)
+            {
+                return NotFound(APIResponse<ChiTietKhuyenMaiResponse>.Fail("Không tồn tại mã khuyến mãi này"));
+            }
+            return Ok(APIResponse<IEnumerable<ChiTietKhuyenMaiResponse>>.OK("Danh sách chi tiết theo khuyến mãi", data));
+        }
+        [HttpGet]
         [Route("chitiet/by-makm/{makm}")]
         public async Task<IActionResult> getchitietbymakm(string makm)
         {
@@ -79,6 +111,22 @@ namespace QA_TMDT.Controllers
                 return NotFound(APIResponse<ChiTietKhuyenMaiResponse>.Fail("Không tồn tại mã khuyến mãi này"));
             }
             return Ok(APIResponse<IEnumerable<ChiTietKhuyenMaiResponse>>.OK("Danh sách chi tiết theo khuyến mãi", data));
+        }
+        [HttpGet]
+        [Route("chitiet/by-masp")]
+        public async Task<IActionResult> getchitietbymaspquery([FromQuery(Name = "id")] string? id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest(APIResponse<ChiTietKhuyenMaiResponse>.Fail("Mã sản phẩm không được để trống"));
+            }
+
+            var data = await _service.GetChiTietKMByMaSP(id);
+            if (data == null)
+            {
+                return NotFound(APIResponse<ChiTietKhuyenMaiResponse>.Fail("Không tồn tại mã sản phẩm này"));
+            }
+            return Ok(APIResponse<IEnumerable<ChiTietKhuyenMaiResponse>>.OK("Danh sách chi tiết theo sản phẩm", data));
         }
         [HttpGet]
         [Route("chitiet/by-masp/{masp}")]

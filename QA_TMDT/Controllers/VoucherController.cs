@@ -24,6 +24,22 @@ namespace QA_TMDT.Controllers
             return Ok(APIResponse<IEnumerable<VoucherResponse>>.OK("Lấy danh sách voucher thành công", data));
         }
         [HttpGet]
+        [Route("by-mavoucher")]
+        public async Task<IActionResult> getvoucherbymavoucherquery([FromQuery(Name = "id")] string? id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest(APIResponse<VoucherResponse>.Fail("Mã voucher không được để trống"));
+            }
+
+            var data = await _service.GetVoucherByCode(id);
+            if(data == null)
+            {
+                return NotFound(APIResponse<VoucherResponse>.Fail("Không có mã voucher này"));
+            }
+            return Ok(APIResponse<VoucherResponse>.OK("Tìm thấy voucher", data));
+        }
+        [HttpGet]
         [Route("by-mavoucher/{mavoucher}")]
         public async Task<IActionResult> getvoucherbymavoucher(string mavoucher)
         {
@@ -63,6 +79,19 @@ namespace QA_TMDT.Controllers
                 return BadRequest(result.Message);
             }
             return Ok(result.Message);
+        }
+        [HttpGet]
+        [Route("avaiable-user-canuse")]
+        public async Task<IActionResult> getavaiablevouchersquery([FromQuery(Name = "id")] string? id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest(APIResponse<IEnumerable<VoucherResponse>>.Fail("Mã tài khoản không được để trống"));
+            }
+
+            var data = await _service.GetVouchersForUser(id);
+
+            return Ok(APIResponse<IEnumerable<VoucherResponse>>.OK("Lấy thành công danh sách voucher tài khoản được phép sử dụng", data));
         }
         [HttpGet]
         [Route("avaiable-user-canuse/{maTK}")]

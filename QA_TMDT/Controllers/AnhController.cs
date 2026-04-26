@@ -23,6 +23,22 @@ namespace QA_TMDT.Controllers
             return Ok(APIResponse<IEnumerable<AnhResponse>>.OK("Lấy danh sách ảnh thành công", data));
         }
         [HttpGet]
+        [Route("by-masp")]
+        public async Task<IActionResult> getanhbymaspquery([FromQuery(Name = "id")] string? id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest(APIResponse<IEnumerable<AnhResponse>>.Fail("Mã sản phẩm không được để trống"));
+            }
+
+            var data = await _service.GetAnhByMaSp(id);
+            if(data == null)
+            {
+                return NotFound(APIResponse<IEnumerable<AnhResponse>>.Fail("Sản phẩm không tồn tại"));
+            }
+            return Ok(APIResponse<IEnumerable<AnhResponse>>.OK("Lấy ảnh sản phẩm thành công", data));
+        }
+        [HttpGet]
         [Route("by-masp/{maSp}")]
         public async Task<IActionResult> getanhbymasp(string maSp)
         {

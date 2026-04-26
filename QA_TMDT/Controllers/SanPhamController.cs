@@ -31,6 +31,18 @@ namespace QA_TMDT.Controllers
             return Ok(APIResponse<PageResult<SanPhamResponse>>.OK("Lấy danh sách sản phẩm thành công", result));
         }
         [HttpGet]
+        [Route("Get-by-maDM")]
+        public async Task<IActionResult> getbymadmquery([FromQuery(Name = "id")] int? id, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery(Name = "status")] bool? status = null, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null, [FromQuery] string? sort = null)
+        {
+            if (id == null)
+            {
+                return BadRequest(APIResponse<PageResult<SanPhamResponse>>.Fail("Mã danh mục không được để trống"));
+            }
+
+            var result = await _service.GetByMaDM(id.Value, page, pageSize, status, minPrice, maxPrice, maKichThuoc, maMauSac, sort);
+            return Ok(APIResponse<PageResult<SanPhamResponse>>.OK("Lấy danh sách sản phẩm theo mã danh mục thành công", result));
+        }
+        [HttpGet]
         [Route("Get-by-maDM/{maDM}")]
         public async Task<IActionResult> getbymadm([FromRoute] int maDM, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery(Name = "status")] bool? status = null, [FromQuery] decimal? minPrice = null, [FromQuery] decimal? maxPrice = null, [FromQuery] int? maKichThuoc = null, [FromQuery] int? maMauSac = null, [FromQuery] string? sort = null)
         {
@@ -87,6 +99,22 @@ namespace QA_TMDT.Controllers
                 return NotFound(APIResponse<SanPhamResponse>.Fail("Sản phẩm không tồn tại"));
             }
             return Ok(APIResponse<SanPhamResponse>.OK("Lấy thông tin sản phẩm thành công", result));
+        }
+        [HttpGet]
+        [Route("Get-chi-tiet-sp-by-maCTSP")]
+        public async Task<IActionResult> getctspbymactspquery([FromQuery(Name = "id")] string? id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest(APIResponse<ChiTietSanPhamResponse>.Fail("Mã chi tiết sản phẩm không được để trống"));
+            }
+
+            var result = await _service.GetChiTietSPByMaCTSP(id);
+            if (result == null)
+            {
+                return NotFound(APIResponse<ChiTietSanPhamResponse>.Fail("Chi tiết sản phẩm không tồn tại"));
+            }
+            return Ok(APIResponse<ChiTietSanPhamResponse>.OK("Lấy thông tin chi tiết sản phẩm thành công", result));
         }
         [HttpGet]
         [Route("Get-chi-tiet-sp-by-maCTSP/{maCTSP}")]

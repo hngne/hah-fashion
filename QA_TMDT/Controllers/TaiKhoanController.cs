@@ -27,6 +27,22 @@ namespace QA_TMDT.Controllers
             return Ok(APIResponse<IEnumerable<TaiKhoanResponse>>.OK("Lấy danh sách tài khoản thành công", result));
         }
         [HttpGet]
+        [Route("getInfo-acc")]
+        public async Task<IActionResult> gettkbymatkquery([FromQuery(Name = "id")] string? id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest(APIResponse<TaiKhoanResponse>.Fail("Mã tài khoản không được để trống"));
+            }
+
+            var result = await _service.GetTKByMaTK(id);
+            if(result == null)
+            {
+                return NotFound(APIResponse<TaiKhoanResponse>.Fail("Không có tài khoản này"));
+            }
+            return Ok(APIResponse<TaiKhoanResponse>.OK("Lấy thông tin tài khoản thành công", result));
+        }
+        [HttpGet]
         [Route("getInfo-acc/{maTK}")]
         public async Task<IActionResult> gettkbymatk(string maTK)
         {
